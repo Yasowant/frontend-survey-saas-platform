@@ -27,6 +27,7 @@ import { MoreHorizontal, Plus, Eye, Pencil, Share2, Trash2 } from "lucide-react"
 
 import { toast } from "sonner";
 import { useDeleteSurvey } from "@/features/surveys/hooks/useDeleteSurvey";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export const Route = createFileRoute("/_app/surveys/")({
   component: SurveyList,
@@ -34,10 +35,11 @@ export const Route = createFileRoute("/_app/surveys/")({
 
 function SurveyList() {
   const { data, isLoading } = useSurveys();
+  const { hasPermission } = usePermissions();
+  console.log(hasPermission, "Has Permisiion");
 
   const items = data?.data || [];
 
-  console.log(items, "Data For Survey");
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
 
@@ -75,12 +77,14 @@ function SurveyList() {
           </p>
         </div>
 
-        <Button asChild>
-          <Link to="/surveys/create">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Survey
-          </Link>
-        </Button>
+        {hasPermission("SURVEY_CREATE") && (
+          <Button asChild>
+            <Link to="/surveys/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Survey
+            </Link>
+          </Button>
+        )}
       </div>
 
       <Card>

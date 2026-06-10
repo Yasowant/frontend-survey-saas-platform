@@ -15,9 +15,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useCreatePermission } from "../hooks/useCreatePermissions";
+import { Dialog, DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
+import { DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export function PermissionsPage() {
   const { data, isLoading } = usePermissions();
+  const { mutate: createPermission, isPending } = useCreatePermission();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   const permissions = data?.data || [];
 
@@ -35,67 +45,106 @@ export function PermissionsPage() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 shadow-2xl">
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-black/10" />
+      <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 shadow-2xl">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.25),transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.15),transparent_40%)]" />
 
-        <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-white/10 blur-3xl animate-pulse" />
-
-        <div className="absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl animate-pulse delay-1000" />
-
-        <CardContent className="relative z-10 p-8 lg:p-10">
+        <CardContent className="relative p-8 lg:p-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            {/* Left Content */}
-            <div className="flex items-center gap-5">
+            {/* Left Section */}
+            <div className="flex items-start gap-5">
               <div
                 className="
-            flex h-20 w-20 items-center justify-center
+            flex h-20 w-20 shrink-0 items-center justify-center
             rounded-3xl
-            border border-white/20
-            bg-white/15
-            backdrop-blur-md
-            shadow-xl
-            transition-all duration-300
-            hover:scale-105
+            bg-gradient-to-br from-indigo-500 to-blue-600
+            shadow-lg shadow-indigo-500/30
           "
               >
                 <Shield className="h-10 w-10 text-white" />
               </div>
 
               <div>
-                <h1 className="text-4xl font-bold tracking-tight text-white">Permissions</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-white lg:text-4xl">
+                  Permissions
+                </h1>
 
-                <p className="mt-2 max-w-2xl text-white/80">
-                  Control access, secure resources, and manage platform permissions across your
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300 lg:text-base">
+                  Control user access, secure resources, and manage platform permissions across your
                   organization.
                 </p>
               </div>
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-4">
-              <div className="rounded-2xl border border-white/20 bg-white/10 px-6 py-4 backdrop-blur-md">
-                <p className="text-xs uppercase tracking-wider text-white/70">Total Permissions</p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              {/* Create Permission */}
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    size="lg"
+                    className="
+                h-14 gap-2 rounded-xl
+                bg-white text-slate-900
+                shadow-lg
+                hover:bg-slate-100
+              "
+                  >
+                    <Plus className="h-4 w-4" />
+                    Create Permission
+                  </Button>
+                </DialogTrigger>
 
-                <p className="mt-1 text-3xl font-bold text-white">{permissions.length}</p>
-              </div>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Create Permission</DialogTitle>
 
-              {/* <Button
-                disabled
-                size="lg"
-                className="
-            gap-2
-            border border-white/20
-            bg-white
-            text-black
-            shadow-lg
-            hover:bg-white
-            disabled:opacity-70
-          "
-              >
-                <Plus className="h-4 w-4" />
-                Create Permission
-              </Button> */}
+                    <DialogDescription>Add a new permission to your platform.</DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Permission Name</Label>
+
+                      <Input
+                        placeholder="e.g. USER_CREATE"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+
+                      <Textarea
+                        placeholder="Describe this permission..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
+                    </div>
+
+                    <Button
+                      className="w-full"
+                      disabled={isPending}
+                      onClick={() =>
+                        createPermission(
+                          { name, description },
+                          {
+                            onSuccess: () => {
+                              setName("");
+                              setDescription("");
+                              setOpen(false);
+                            },
+                          },
+                        )
+                      }
+                    >
+                      {isPending ? "Creating..." : "Create Permission"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardContent>

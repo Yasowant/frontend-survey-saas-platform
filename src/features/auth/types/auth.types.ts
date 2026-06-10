@@ -33,10 +33,11 @@ export interface LoginResponse {
       firstName: string;
       lastName: string;
       email: string;
-      roleIds: string[];
       isEmailVerified: boolean;
       isActive: boolean;
     };
+    roles: string[];
+    permissions: string[];
     accessToken: string;
     refreshToken: string;
   };

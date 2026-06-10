@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { authService } from "../services/auth.service";
+import { useLogin } from "../hooks/useLogin";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,31 +27,18 @@ export function LoginForm() {
     }
 
     try {
-      setLoading(true);
-
-      const response = await authService.login({
+      await loginMutation.mutateAsync({
         email,
         password,
       });
 
-      console.log("LOGIN SUCCESS");
-      console.log(response);
-      localStorage.setItem("accessToken", response.data.accessToken);
-
-      localStorage.setItem("refreshToken", response.data.refreshToken);
-
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-
-      toast.success(response.message);
+      toast.success("Login successful");
 
       await navigate({
         to: "/dashboard",
       });
-      console.log("CURRENT URL", window.location.pathname);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Login failed");
-    } finally {
-      setLoading(false);
     }
   };
 
