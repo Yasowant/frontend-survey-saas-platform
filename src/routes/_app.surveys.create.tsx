@@ -180,6 +180,20 @@ function CreateSurvey() {
     }
   };
 
+  const handleDeleteSection = (sectionId: string) => {
+    const sectionQuestionIds = questions.filter((q) => q.sectionId === sectionId).map((q) => q.id);
+    setSections((prev) => prev.filter((s) => s.id !== sectionId));
+    setQuestions((prev) => prev.filter((q) => q.sectionId !== sectionId));
+    setRules((prev) =>
+      prev.filter(
+        (r) =>
+          !sectionQuestionIds.includes(r.ifQuestionId) &&
+          !sectionQuestionIds.includes(r.thenQuestionId),
+      ),
+    );
+    toast.success("Section deleted");
+  };
+
   return (
     <div className="space-y-5">
       <div>
@@ -295,7 +309,7 @@ function CreateSurvey() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSections(sections.filter((x) => x.id !== s.id))}
+                    onClick={() => handleDeleteSection(s.id)}
                     disabled={sections.length === 1}
                   >
                     <Trash2 className="h-4 w-4" />

@@ -23,9 +23,10 @@ import {
 
 import { useSurveys } from "@/features/surveys/hooks/useSurveys";
 
-import { MoreHorizontal, Plus, Eye, Pencil, Share2 } from "lucide-react";
+import { MoreHorizontal, Plus, Eye, Pencil, Share2, Trash2 } from "lucide-react";
 
 import { toast } from "sonner";
+import { useDeleteSurvey } from "@/features/surveys/hooks/useDeleteSurvey";
 
 export const Route = createFileRoute("/_app/surveys/")({
   component: SurveyList,
@@ -36,6 +37,7 @@ function SurveyList() {
 
   const items = data?.data || [];
 
+  console.log(items, "Data For Survey");
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
 
@@ -46,6 +48,17 @@ function SurveyList() {
         survey.title.toLowerCase().includes(q.toLowerCase()),
     );
   }, [items, q, status]);
+  const deleteSurveyMutation = useDeleteSurvey();
+
+  const handleDelete = (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this survey?\n\nAll related sections, questions and rules will also be deleted.",
+    );
+
+    if (!confirmed) return;
+
+    deleteSurveyMutation.mutate(id);
+  };
 
   if (isLoading) {
     return <div className="p-6">Loading...</div>;
@@ -154,6 +167,11 @@ function SurveyList() {
                           <DropdownMenuItem>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem onClick={() => handleDelete(survey._id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
                           </DropdownMenuItem>
 
                           <DropdownMenuItem

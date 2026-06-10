@@ -4,5 +4,6 @@ export const surveyService = {
   createSurvey: surveyApi.createSurvey,
   getSurveys: surveyApi.getSurveys,
   getSurveyById: surveyApi.getSurveyById,
+  deleteSurvey: surveyApi.deleteSurvey,
   submitSurveyResponse: surveyApi.submitSurveyResponse,
 };

@@ -24,6 +24,10 @@ export const getSurveyById = async (id: string) => {
   return response.data;
 };
 
+export const deleteSurvey = async (id: string) => {
+  const response = await api.delete(`/surveys/${id}`);
+  return response.data;
+};
 export const submitSurveyResponse = async (payload: {
   surveyId: string;
   answers: {
