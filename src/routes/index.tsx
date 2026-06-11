@@ -131,6 +131,33 @@ const stats = [
   { value: 120, suffix: "+", label: "Countries served" },
 ];
 
+const workflowSteps = [
+  {
+    title: "Create Survey",
+    description: "Build surveys with drag-and-drop questions and smart templates.",
+    icon: PenLine,
+    color: "from-violet-500 to-fuchsia-500",
+  },
+  {
+    title: "Share Anywhere",
+    description: "Send links, embed forms, or distribute through email campaigns.",
+    icon: Send,
+    color: "from-cyan-500 to-blue-500",
+  },
+  {
+    title: "Track Responses",
+    description: "Watch responses arrive in real-time dashboards.",
+    icon: Users,
+    color: "from-emerald-500 to-teal-500",
+  },
+  {
+    title: "Generate Insights",
+    description: "Turn raw data into reports and actionable decisions.",
+    icon: LineChart,
+    color: "from-orange-500 to-rose-500",
+  },
+];
+
 function useCountUp(target: number, start: boolean, duration = 1500) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -537,6 +564,92 @@ function Landing() {
         </div>
       </section>
 
+      <section className="relative overflow-hidden py-28">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
+
+        <div className="relative mx-auto max-w-6xl px-4">
+          <div className="text-center">
+            <Badge variant="outline">Workflow</Badge>
+
+            <h2 className="mt-4 text-4xl font-bold md:text-6xl">How Survesy Works</h2>
+
+            <p className="mt-4 text-muted-foreground">
+              From survey creation to actionable insights.
+            </p>
+          </div>
+
+          <div className="relative mt-24">
+            {/* Center Line */}
+            <div className="absolute left-1/2 top-0 hidden h-full w-px bg-gradient-to-b from-primary via-chart-2 to-chart-5 md:block" />
+
+            {workflowSteps.map((step, index) => {
+              const left = index % 2 === 0;
+
+              return (
+                <div
+                  key={step.title}
+                  className={`relative mb-20 flex ${left ? "justify-start" : "justify-end"}`}
+                >
+                  <Card
+                    className={`
+                group
+                relative
+                w-full
+                max-w-md
+                overflow-hidden
+                border-border/50
+                bg-background/70
+                backdrop-blur-xl
+                transition-all
+                duration-500
+                hover:-translate-y-2
+                hover:shadow-2xl
+                hover:shadow-primary/20
+                ${left ? "-rotate-1" : "rotate-1"}
+              `}
+                  >
+                    <div
+                      className={`absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10 bg-gradient-to-br ${step.color}`}
+                    />
+
+                    <CardContent className="p-6">
+                      <div
+                        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-white`}
+                      >
+                        <step.icon className="h-6 w-6" />
+                      </div>
+
+                      <h3 className="text-xl font-semibold">{step.title}</h3>
+
+                      <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Timeline Dot */}
+                  <div
+                    className="
+                absolute
+                left-1/2
+                top-1/2
+                hidden
+                h-5
+                w-5
+                -translate-x-1/2
+                -translate-y-1/2
+                rounded-full
+                border-4
+                border-background
+                bg-primary
+                md:block
+              "
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="relative border-t border-border/60 bg-muted/30">
         <div className="absolute inset-0 -z-10 grid-bg opacity-50" />
@@ -601,60 +714,104 @@ function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <Reveal>
-          <div className="text-center">
-            <Badge variant="outline" className="mb-3">
-              Loved by teams
-            </Badge>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              What our customers say
-            </h2>
-          </div>
-        </Reveal>
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
-          {[
-            {
-              name: "Aarav Mehta",
-              role: "Product Lead, Lumen",
-              quote: "Survesy made our research workflow 3x faster. The analytics are gorgeous.",
-            },
-            {
-              name: "Sofia Rossi",
-              role: "CX Manager, Orbital",
-              quote: "Conditional logic finally feels visual. Our completion rate jumped to 92%.",
-            },
-            {
-              name: "Liam O'Connor",
-              role: "Founder, PixelForge",
-              quote: "Beautiful out of the box. Our customers actually enjoy filling these out.",
-            },
-          ].map((t, i) => (
-            <Reveal key={t.name} delay={i * 100}>
-              <Card className="h-full transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
-                <CardContent className="p-6">
+      {/* Testimonials */}
+      <section className="relative overflow-hidden py-24">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-primary/5 to-background" />
+
+        <div className="mx-auto max-w-7xl px-4">
+          <Reveal>
+            <div className="text-center">
+              <Badge variant="outline" className="mb-4">
+                Trusted Worldwide
+              </Badge>
+
+              <h2 className="text-4xl font-bold tracking-tight md:text-6xl">
+                Loved by thousands of teams
+              </h2>
+
+              <p className="mt-4 text-muted-foreground">
+                From startups to enterprises, teams trust Survesy to collect meaningful feedback and
+                make smarter decisions.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-16 grid gap-8 lg:grid-cols-[1.7fr_1fr]">
+            {/* Featured Testimonial */}
+            <Reveal>
+              <Card className="relative overflow-hidden border-primary/20 bg-card/70 backdrop-blur-xl shadow-glow">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10" />
+
+                <CardContent className="relative p-10">
                   <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                     ))}
                   </div>
-                  <p className="mt-3 text-sm">"{t.quote}"</p>
-                  <div className="mt-5 flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-xs font-semibold text-primary-foreground">
-                      {t.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+
+                  <h3 className="mt-6 text-3xl font-semibold leading-tight">
+                    “Survesy completely transformed our customer feedback workflow.”
+                  </h3>
+
+                  <p className="mt-4 text-lg text-muted-foreground">
+                    We increased survey completion rates by 92% and reduced reporting time from
+                    hours to minutes. The analytics dashboard alone saved our team countless hours
+                    every month.
+                  </p>
+
+                  <div className="mt-8 flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-lg font-bold text-white">
+                      SR
                     </div>
+
                     <div>
-                      <div className="text-sm font-medium">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.role}</div>
+                      <div className="font-semibold">Sofia Rossi</div>
+                      <div className="text-sm text-muted-foreground">CX Manager · Orbital</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </Reveal>
-          ))}
+
+            {/* Side Reviews */}
+            <div className="space-y-4">
+              {[
+                {
+                  name: "Aarav",
+                  text: "Analytics are incredible and easy to understand.",
+                },
+                {
+                  name: "Liam",
+                  text: "Setup took less than 5 minutes.",
+                },
+                {
+                  name: "Sarah",
+                  text: "The best survey builder we've used so far.",
+                },
+              ].map((review, index) => (
+                <Reveal key={review.name} delay={index * 100}>
+                  <Card
+                    className="group bg-card/70 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40 hover:shadow-glow"
+                    style={{
+                      transform: `rotate(${index % 2 === 0 ? "-1deg" : "1deg"})`,
+                    }}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                        ))}
+                      </div>
+
+                      <p className="mt-3 text-sm">"{review.text}"</p>
+
+                      <p className="mt-4 text-xs text-muted-foreground">— {review.name}</p>
+                    </CardContent>
+                  </Card>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
