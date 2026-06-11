@@ -158,6 +158,29 @@ const workflowSteps = [
   },
 ];
 
+const testimonials = [
+  {
+    name: "Sofia Rossi",
+    role: "CX Manager",
+    quote: "Conditional logic finally feels visual. Our completion rate jumped to 92%.",
+  },
+  {
+    name: "Aarav Mehta",
+    role: "Product Lead",
+    quote: "Survesy made our research workflow 3x faster. The analytics are gorgeous.",
+  },
+  {
+    name: "Liam O'Connor",
+    role: "Founder",
+    quote: "Beautiful out of the box. Customers actually enjoy filling surveys.",
+  },
+  {
+    name: "Emma Wilson",
+    role: "Marketing Head",
+    quote: "We replaced three tools with Survesy and saved hours every week.",
+  },
+];
+
 function useCountUp(target: number, start: boolean, duration = 1500) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -713,7 +736,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
       {/* Testimonials */}
       <section className="relative overflow-hidden py-24">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-primary/5 to-background" />

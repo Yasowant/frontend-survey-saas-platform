@@ -7,5 +7,6 @@ export const createPermission = async (payload: { name: string; description: str
 
 export const getPermissions = async () => {
   const response = await api.get("/permissions");
+  console.log(response, "Data For Response");
   return response.data;
 };

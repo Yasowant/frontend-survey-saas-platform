@@ -1,4 +1,4 @@
-export const usePermissions = () => {
+export const useRolePermissions = () => {
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
   console.log(permissions, "111 permisioons");
   const roles = JSON.parse(localStorage.getItem("roles") || "[]");

@@ -1,8 +1,26 @@
 import { Link } from "@tanstack/react-router";
 import { Shield, Eye, Users, KeyRound, Activity, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useRoles } from "../hooks/useRoles";
 import { useUsers } from "@/features/users/hooks/userUsers";
+import { useCreateRole } from "../hooks/useCreateRole";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,10 +34,49 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { usePermissions } from "@/features/permissions/hooks/usePermissions";
+import { useState } from "react";
 
 export function RolesPage() {
+  const [open, setOpen] = useState(false);
+  const [roleName, setRoleName] = useState("");
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const { data: rolesData, isLoading: rolesLoading } = useRoles();
   const { data: usersData, isLoading: usersLoading } = useUsers();
+  const { mutate: createRole, isPending } = useCreateRole();
+
+  const { data: permissionsData } = usePermissions();
+
+  const permissions = permissionsData?.data || [];
+  const handelCreateRole = () => {
+    if (!roleName.trim()) {
+      return;
+    }
+    createRole(
+      {
+        name: roleName,
+        permissions: selectedPermissions,
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setRoleName("");
+          setSelectedPermissions([]);
+        },
+        onError: (error) => {
+          console.error("Failed to Create role", error);
+        },
+      },
+    );
+  };
+
+  const handlePermissionSelect = (permissionId: string) => {
+    if (selectedPermissions.includes(permissionId)) {
+      setSelectedPermissions(selectedPermissions.filter((id) => id !== permissionId));
+    } else {
+      setSelectedPermissions([...selectedPermissions, permissionId]);
+    }
+  };
 
   const roles = rolesData?.data || [];
   const users = usersData?.data || [];
@@ -66,7 +123,11 @@ export function RolesPage() {
               </div>
             </div>
 
-            <Button disabled size="lg" className="gap-2 bg-white text-black hover:bg-white">
+            <Button
+              size="lg"
+              className="gap-2 bg-white text-black hover:bg-white"
+              onClick={() => setOpen(true)}
+            >
               <Plus className="h-4 w-4" />
               Create Role
             </Button>
@@ -113,6 +174,69 @@ export function RolesPage() {
         </Card>
       </div>
 
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create New Role</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Role Name */}
+            <div>
+              <label className="mb-2 block text-sm font-medium">Role Name</label>
+
+              <Input
+                placeholder="Enter role name"
+                value={roleName}
+                onChange={(e) => setRoleName(e.target.value)}
+              />
+            </div>
+
+            {/* Permissions Dropdown */}
+            <div>
+              <label className="mb-2 block text-sm font-medium">Permissions</label>
+
+              <Select onValueChange={(value) => handlePermissionSelect(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select permission" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {permissions.map((permission: any) => (
+                    <SelectItem key={permission._id} value={permission._id}>
+                      {permission.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Selected Permissions */}
+            <div className="flex flex-wrap gap-2">
+              {selectedPermissions.map((permissionId) => {
+                const permission = permissions.find((p: any) => p._id === permissionId);
+
+                return (
+                  <Badge key={permissionId} variant="secondary">
+                    {permission?.name}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button onClick={handelCreateRole} disabled={isPending || !roleName.trim()}>
+              {isPending ? "Creating..." : "Create Role"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Roles Table */}
       <Card className="border-0 shadow-md">
         <CardContent className="p-0">
@@ -154,7 +278,6 @@ export function RolesPage() {
 
                       <div>
                         <p className="font-medium">{role.name}</p>
-
                         <p className="text-xs text-muted-foreground">System Role</p>
                       </div>
                     </div>
