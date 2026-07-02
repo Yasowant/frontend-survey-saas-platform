@@ -1,322 +1,147 @@
-# Survey SaaS Platform - Frontend
+# Survesy — Frontend (Survey SaaS Platform)
 
-A modern survey management platform built with React, TypeScript, TanStack Router, React Query, ShadCN UI, and Recharts.
+A modern survey platform frontend built with React 19, TypeScript, TanStack Router/Start, TanStack Query, shadcn/ui (Radix), Tailwind CSS, and Recharts.
 
-The application enables administrators to create surveys, manage responses, view analytics, and monitor platform activity through an intuitive dashboard.
-
----
+Admins build multi-section surveys with a visual rule engine, publish them with one click, and share them by public link or email invitation. Respondents answer through a public page — no account required. The backend for this project lives in the companion repo: `backend-saas-platform`.
 
 > **100% free platform** — every feature is included, with no subscription, billing, or payment module.
 
+---
+
 ## Features
 
-### Authentication & Authorization
+### Landing Page
 
-* User Login
-* Secure Authentication
-* Protected Routes
-* Role-Based Access Control (RBAC)
+Premium marketing page (`/`) with an animated rule-engine demo in the hero, honest product-fact stats, capability marquee, bento feature grid, accordion FAQ, and light/dark theme toggle. All copy reflects features that actually ship.
 
-### Dashboard
+### Survey Builder (4-step wizard)
 
-* Total Surveys
-* Total Responses
-* Total Users
-* Published Surveys
-* Draft Surveys
-* Response Statistics
-* Most Popular Survey
-* Recent Survey Activity
+* **Information** — title, description, category
+* **Build** — sections, questions (10 types: text, number, email, phone, dropdown, radio, checkbox, date, file, rating), and the visual rules editor
+* **Preview** — live preview with full rule evaluation as you answer
+* **Publish** — save as draft or publish (client-side pre-publish validation)
+
+### Rule Engine (Conditional Logic)
+
+The client-side engine in `src/lib/rule-engine.ts` mirrors the backend exactly, so preview, public survey, and server validation always agree.
+
+* 8 operators: equals, does not equal, greater than, less than, contains, does not contain, is empty, is not empty
+* 6 actions: show, hide, require, make optional, enable, disable
+* SHOW-targeted questions are hidden by default until their rule matches
+* Rules apply in order; later rules win on conflict
 
 ### Survey Management
 
-* Create Survey
-* Edit Survey
-* Delete Survey
-* Publish / Draft Survey
-* Survey Details View
-* Survey Analytics
+* Survey list with search + status filter (Draft / Published / Closed)
+* One-click **Publish**, **Close**, and **Reopen** from the row menu
+* Edit dialog (title, description)
+* **Share dialog**: copy the public link or send email invitations (up to 20 recipients, optional personal message — delivered in the background)
+* Delete with cascade confirmation
 
-### Dynamic Survey Builder
+### Public Survey Taking — `/survey/:id`
 
-* Create Sections
-* Add Questions
-* Reorder Questions
-* Multiple Question Types
+* Works without login — fetches the public endpoint, so anyone with the link can respond
+* Full rule evaluation while answering (visibility, required, enabled states)
+* All 10 question types rendered
+* Client-side required-answer validation before submit (server re-validates)
+* Clear unavailable states (unpublished, closed, or expired surveys)
 
-Supported Question Types:
+### Auth Flow
 
-* Text
-* Textarea
-* Number
-* Radio
-* Checkbox
-* Dropdown
+* Login / Register with email verification
+* **Forgot password** → branded reset email → **`/reset-password`** page (token validation, password confirmation, minimum length)
+* JWT storage with automatic Authorization header + 401 redirect handling
 
-### Survey Responses
+### Dashboard & Analytics
 
-* Submit Responses
-* View Survey Responses
-* Response Tracking
-* Response Analytics
+Total surveys/responses/users, published vs. draft counts, response statistics, most popular survey, recent activity, per-survey analytics, and response browsing with answer details.
 
-### Analytics
+### Admin
 
-* Dashboard Analytics
-* Survey Analytics
-* Response Trends
-* Response Statistics
-* Survey Status Distribution
-* Platform Statistics
-
-### UI Features
-
-* Responsive Design
-* Dark Mode Support
-* Reusable Component Architecture
-* Modern Dashboard Layout
-* Interactive Charts
+User management, roles & permissions (RBAC-gated UI), audit log viewer, notifications, profile & settings.
 
 ---
 
 ## Tech Stack
 
-### Frontend
-
-* React 19
-* TypeScript
-* Vite
-
-### Routing
-
-* TanStack Router
-
-### State Management
-
-* React Query (TanStack Query)
-
-### Styling
-
-* Tailwind CSS
-* ShadCN UI
-
-### Charts
-
-* Recharts
-
-### Icons
-
-* Lucide React
-
-### HTTP Client
-
-* Axios
+React 19 · TypeScript · TanStack Router (file-based routing) · TanStack Query v5 · shadcn/ui + Radix · Tailwind CSS · React Hook Form + Zod · Axios · Recharts · Vite · sonner (toasts)
 
 ---
 
 ## Project Structure
 
-```bash
-src
-│
-├── routes
-│   ├── dashboard
-│   ├── surveys
-│   ├── analytics
-│   ├── responses
-│   └── users
-│
-├── features
-│   ├── analytics
-│   │   ├── api
-│   │   ├── hooks
-│   │   ├── services
-│   │   └── types
-│   │
-│   ├── surveys
-│   │   ├── api
-│   │   ├── hooks
-│   │   ├── services
-│   │   └── types
-│   │
-│   ├── responses
-│   └── users
-│
-├── shared
-│   ├── api
-│   ├── constants
-│   ├── hooks
-│   └── utils
-│
-├── components
-│   ├── ui
-│   └── common
-│
-└── assets
+```
+src/
+├── routes/                      # File-based routes
+│   ├── index.tsx                # Landing page
+│   ├── login.tsx / register.tsx
+│   ├── forgot-password.tsx      # Sends real reset email
+│   ├── reset-password.tsx       # Token-based password reset
+│   ├── verify-email.tsx
+│   ├── survey.$id.tsx           # PUBLIC survey-taking page (no auth)
+│   └── _app.*.tsx               # Authenticated app (dashboard, surveys,
+│                                #   responses, analytics, users, roles…)
+├── features/
+│   ├── auth/                    # API, hooks, types, pages
+│   └── surveys/                 # API, hooks (publish/close/share/public…), services
+├── lib/
+│   ├── rule-engine.ts           # Shared rule engine (mirrors backend)
+│   ├── types.ts                 # Domain types (Rule, Question, Section…)
+│   └── theme.ts                 # Light/dark theme
+├── components/ui/               # shadcn/ui components
+└── shared/api/axios.ts          # Axios instance + auth interceptors
 ```
 
 ---
 
-## Installation
+## Getting Started
 
-Clone the repository:
+### Prerequisites
 
-```bash
-git clone <repository-url>
-```
+Node.js 18+ and the backend running (see `backend-saas-platform`).
 
-Navigate to project:
-
-```bash
-cd survey-saas-frontend
-```
-
-Install dependencies:
+### Setup
 
 ```bash
 npm install
+echo "VITE_API_URL=http://localhost:5000/api/v1" > .env
+npm run dev        # http://localhost:3000
 ```
 
----
-
-## Environment Variables
-
-Create a `.env` file:
+### Environment Variables
 
 ```env
-VITE_API_URL=http://localhost:4000/api/v1
+VITE_API_URL=http://localhost:5000/api/v1
 ```
 
----
+### Scripts
 
-## Run Development Server
-
-```bash
-npm run dev
-```
-
-Application runs at:
-
-```bash
-http://localhost:8080
-```
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build |
+| `npm run build:dev` | Development-mode build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier |
 
 ---
 
-## Build Production
+## Key Flows
 
-```bash
-npm run build
-```
+**Create → Publish → Share → Analyze**
 
----
+1. `Surveys → Create Survey` — walk the 4-step wizard; add rules like *IF "Team size" is greater than 50 THEN require "Department"*.
+2. Publish from step 4, or later via the row menu on the survey list.
+3. Row menu → **Share** — copy the public link or send email invitations.
+4. Respondents open `/survey/:id` and answer without signing in; rules run live.
+5. Watch results under **Responses** and **Analytics**.
 
-## Preview Production Build
+**Password reset**
 
-```bash
-npm run preview
-```
+`/forgot-password` → email with reset link (sent in background) → `/reset-password?token=…` → new password → confirmation email → sign in.
 
----
+## Notes
 
-## API Integration
-
-The frontend communicates with the backend through Axios.
-
-Example:
-
-```ts
-import { api } from "@/shared/api/axios";
-
-export const getSurveys = async () => {
-  const response = await api.get("/surveys");
-
-  return response.data;
-};
-```
-
----
-
-## React Query Example
-
-```ts
-import { useQuery } from "@tanstack/react-query";
-
-export const useSurveys = () => {
-  return useQuery({
-    queryKey: ["surveys"],
-    queryFn: getSurveys,
-  });
-};
-```
-
----
-
-## Analytics Endpoints
-
-### Dashboard Analytics
-
-```http
-GET /analytics/dashboard
-```
-
-### Survey Analytics
-
-```http
-GET /analytics/survey/:surveyId
-```
-
----
-
-## Dashboard Modules
-
-### Overview Cards
-
-* Total Surveys
-* Total Responses
-* Total Users
-* Published Surveys
-
-### Charts
-
-* Survey Status Distribution
-* Platform Distribution
-* Response Trend
-
-### Survey Insights
-
-* Most Popular Survey
-* Recent Surveys
-
----
-
-## Code Quality
-
-* ESLint
-* TypeScript Strict Mode
-* Feature-Based Architecture
-* Reusable Components
-* Clean API Layer
-* Service Layer Pattern
-* Custom Hooks Pattern
-
----
-
-## Future Enhancements
-
-* Export Analytics PDF
-* Export Excel Reports
-* Survey Templates
-* Real-Time Analytics
-* WebSocket Notifications
-* Advanced Survey Rules Engine
-* Team Management
-* Multi-Tenant Support
-
----
-
-## Author
-
-Developed by Yasowant
-
-Frontend Survey SaaS Platform built using modern React architecture and best practices.
+* Emails (verification, reset, invitations) are sent by the backend in the background — the UI never blocks on delivery.
+* `src/routeTree.gen.ts` is generated by the TanStack Router Vite plugin; it refreshes automatically on `npm run dev`.
