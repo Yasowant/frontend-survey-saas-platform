@@ -17,6 +17,8 @@ import {
   Users,
   Shield,
   KeyRound,
+  Wand2,
+  type LucideIcon,
 } from "lucide-react";
 
 import {
@@ -34,7 +36,14 @@ import {
 } from "@/components/ui/sidebar";
 import { authService } from "@/features/auth/services/auth.service";
 
-const sections = [
+interface NavItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  search?: Record<string, unknown>;
+}
+
+const sections: { label: string; items: NavItem[] }[] = [
   {
     label: "Overview",
     items: [
@@ -57,6 +66,12 @@ const sections = [
         title: "Create Survey",
         url: "/surveys/create",
         icon: Plus,
+      },
+      {
+        title: "Generate with AI",
+        url: "/surveys",
+        icon: Wand2,
+        search: { ai: true },
       },
       {
         title: "Draft Surveys",
@@ -204,9 +219,9 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {sec.items.map((item) => (
-                  <SidebarMenuItem key={item.url}>
+                  <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                      <Link to={item.url} className="flex items-center gap-2">
+                      <Link to={item.url} search={item.search} className="flex items-center gap-2">
                         <item.icon className="h-4 w-4" />
 
                         {!collapsed && <span>{item.title}</span>}

@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +60,9 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/surveys/")({
+  validateSearch: (search: Record<string, unknown>): { ai?: boolean } => ({
+    ai: search.ai === true || search.ai === "true" ? true : undefined,
+  }),
   component: SurveyList,
 });
 
@@ -86,8 +89,20 @@ function SurveyList() {
   const [shareEmails, setShareEmails] = useState("");
   const [shareMessage, setShareMessage] = useState("");
 
-  const [aiOpen, setAiOpen] = useState(false);
+  const { ai } = Route.useSearch();
+  const navigate = useNavigate();
+  const [aiOpen, setAiOpen] = useState(Boolean(ai));
   const [aiPrompt, setAiPrompt] = useState("");
+
+  // Open the AI dialog when arriving via the sidebar "Generate with AI" link.
+  useEffect(() => {
+    if (ai) setAiOpen(true);
+  }, [ai]);
+
+  const closeAi = () => {
+    setAiOpen(false);
+    if (ai) navigate({ to: "/surveys", search: {} });
+  };
 
   const filtered = useMemo(() => {
     return items.filter(
@@ -111,7 +126,7 @@ function SurveyList() {
     }
     generateSurveyMutation.mutate(aiPrompt.trim(), {
       onSuccess: () => {
-        setAiOpen(false);
+        closeAi();
         setAiPrompt("");
       },
     });
@@ -361,7 +376,7 @@ function SurveyList() {
       </Card>
 
       {/* AI generate dialog */}
-      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+      <Dialog open={aiOpen} onOpenChange={(open) => (open ? setAiOpen(true) : closeAi())}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -389,7 +404,7 @@ function SurveyList() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAiOpen(false)}>
+            <Button variant="outline" onClick={closeAi}>
               Cancel
             </Button>
             <Button onClick={handleGenerate} disabled={generateSurveyMutation.isPending}>

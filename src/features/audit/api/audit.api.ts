@@ -11,6 +11,8 @@ export interface ApiAuditLog {
   action: string;
   entityType: string;
   entityId: string;
+  oldValue?: Record<string, unknown> | null;
+  newValue?: Record<string, unknown> | null;
   createdAt: string;
 }
 
