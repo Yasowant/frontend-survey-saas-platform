@@ -16,7 +16,19 @@ export interface ApiAuditLog {
   createdAt: string;
 }
 
-export const getAuditLogs = async () => {
-  const response = await api.get("/audit-logs");
-  return response.data;
+export interface AuditLogPage {
+  items: ApiAuditLog[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export const getAuditLogs = async (params: {
+  page?: number;
+  limit?: number;
+  entityType?: string;
+}) => {
+  const response = await api.get("/audit-logs", { params });
+  return response.data as { success: boolean; message: string; data: AuditLogPage };
 };

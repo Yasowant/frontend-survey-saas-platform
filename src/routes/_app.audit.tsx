@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -11,9 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getAuditLogs, type ApiAuditLog } from "@/features/audit/api/audit.api";
 
 export const Route = createFileRoute("/_app/audit")({ component: Audit });
+
+const PAGE_SIZE = 20;
+
+const ENTITY_OPTIONS = [
+  { value: "all", label: "All Modules" },
+  { value: "SURVEY", label: "Surveys" },
+  { value: "Role", label: "Roles" },
+];
 
 const userName = (log: ApiAuditLog) => {
   const u = log.userId;
@@ -83,37 +93,49 @@ const timeAgo = (date: string) => {
 function Audit() {
   const [q, setQ] = useState("");
   const [entity, setEntity] = useState("all");
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["audit-logs"],
-    queryFn: getAuditLogs,
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["audit-logs", page, entity],
+    queryFn: () =>
+      getAuditLogs({
+        page,
+        limit: PAGE_SIZE,
+        entityType: entity === "all" ? undefined : entity,
+      }),
+    placeholderData: keepPreviousData,
   });
 
-  const items: ApiAuditLog[] = data?.data ?? [];
+  const pageData = data?.data;
+  const items: ApiAuditLog[] = pageData?.items ?? [];
+  const total = pageData?.total ?? 0;
+  const totalPages = pageData?.totalPages ?? 1;
 
-  const entityTypes = useMemo(
-    () => [...new Set(items.map((i) => i.entityType).filter(Boolean))],
-    [items],
-  );
-
+  // Text search filters the current page client-side.
   const filtered = useMemo(
     () =>
-      items.filter(
-        (i) =>
-          (entity === "all" || i.entityType === entity) &&
-          [userName(i), i.action, i.entityType, details(i)].some((s) =>
-            (s || "").toLowerCase().includes(q.toLowerCase()),
-          ),
+      items.filter((i) =>
+        [userName(i), i.action, i.entityType, details(i)].some((s) =>
+          (s || "").toLowerCase().includes(q.toLowerCase()),
+        ),
       ),
-    [items, q, entity],
+    [items, q],
   );
+
+  const changeEntity = (value: string) => {
+    setEntity(value);
+    setPage(1);
+  };
+
+  const from = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, total);
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Audit logs</h1>
         <p className="text-sm text-muted-foreground">
-          Every action, who did it, and when · {filtered.length} events
+          Every action, who did it, and when · {total} events
         </p>
       </div>
 
@@ -121,20 +143,19 @@ function Audit() {
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-3">
             <Input
-              placeholder="Search user, action, survey…"
+              placeholder="Search this page…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="max-w-xs"
             />
-            <Select value={entity} onValueChange={setEntity}>
+            <Select value={entity} onValueChange={changeEntity}>
               <SelectTrigger className="w-44">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Modules</SelectItem>
-                {entityTypes.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t.charAt(0) + t.slice(1).toLowerCase()}
+                {ENTITY_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -152,7 +173,7 @@ function Audit() {
                   <th className="px-4 py-2 font-medium text-right">When</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isFetching ? "opacity-60" : ""}>
                 {isLoading && (
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
@@ -167,7 +188,7 @@ function Audit() {
                     </td>
                   </tr>
                 )}
-                {filtered.slice(0, 200).map((i) => (
+                {filtered.map((i) => (
                   <tr key={i._id} className="border-t hover:bg-muted/30">
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-2.5">
@@ -196,6 +217,36 @@ function Audit() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Showing {from}–{to} of {total}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1 || isFetching}
+              >
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages || isFetching}
+              >
+                Next
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
