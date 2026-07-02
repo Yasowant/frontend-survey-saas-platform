@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import demoVideo from "@/assets/videos/survesy-demo.mp4";
 import {
   ArrowRight,
@@ -10,26 +16,21 @@ import {
   CheckCircle2,
   FileText,
   Layers,
-  Star,
   ShieldCheck,
   Sparkles,
   Workflow,
   Zap,
-  Users,
-  TrendingUp,
-  Globe,
   Play,
   PenLine,
   Send,
   LineChart,
-  GraduationCap,
-  Building2,
-  ShoppingBag,
-  HeartPulse,
-  Briefcase,
-  Megaphone,
+  Rocket,
+  Link2,
+  Bell,
+  Eye,
   Moon,
   Sun,
+  Star,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
@@ -41,135 +42,151 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Free enterprise survey platform with powerful analytics and conditional logic.",
+          "Free survey platform with a visual rule engine, one-click publishing, public share links, and real-time analytics.",
       },
       { property: "og:title", content: "Survesy — Build Surveys, Grow Insights" },
       {
         property: "og:description",
-        content: "Beautiful surveys. Real-time analytics. Built for modern teams.",
+        content:
+          "Build multi-section surveys with conditional logic, publish with one click, and share a public link — no respondent accounts needed.",
       },
     ],
   }),
   component: Landing,
 });
 
+/* ------------------------------------------------------------------ */
+/* Content — kept accurate to what the product actually ships          */
+/* ------------------------------------------------------------------ */
+
 const features = [
+  {
+    icon: Workflow,
+    title: "Visual rule engine",
+    desc: "8 operators and 6 actions — show, hide, require, make optional, enable or disable any question based on earlier answers. Rules run live in preview and are enforced on the server.",
+    color: "from-violet-500 to-indigo-500",
+    large: true,
+  },
+  {
+    icon: Rocket,
+    title: "One-click publishing",
+    desc: "Publish, close, or reopen a survey from the dashboard. Pre-publish validation makes sure nothing incomplete goes live.",
+    color: "from-fuchsia-500 to-pink-500",
+  },
+  {
+    icon: Link2,
+    title: "Public share links",
+    desc: "Every published survey gets a link anyone can open — no respondent account required, anonymous responses supported.",
+    color: "from-cyan-500 to-blue-500",
+  },
   {
     icon: Layers,
     title: "Multi-section surveys",
-    desc: "Organize questions into clear sections, each with their own focus.",
-    color: "from-violet-500 to-indigo-500",
-  },
-  {
-    icon: Workflow,
-    title: "Conditional logic",
-    desc: "Show or hide questions based on previous answers with the rules engine.",
-    color: "from-fuchsia-500 to-pink-500",
+    desc: "Organize questions into ordered sections with 10 question types: text, rating, dropdown, checkbox, date, and more.",
+    color: "from-amber-500 to-orange-500",
   },
   {
     icon: BarChart3,
     title: "Real-time analytics",
-    desc: "Track responses, completion rates, and trends with rich dashboards.",
-    color: "from-cyan-500 to-blue-500",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Audit & permissions",
-    desc: "Role-based access and full audit logs for enterprise compliance.",
+    desc: "Responses appear on your dashboard the moment they arrive, with per-survey breakdowns and answer details.",
     color: "from-emerald-500 to-teal-500",
   },
   {
-    icon: Zap,
-    title: "10 question types",
-    desc: "Text, rating, dropdown, file upload, date, and more out of the box.",
-    color: "from-amber-500 to-orange-500",
-  },
-  {
-    icon: Sparkles,
-    title: "Free forever",
-    desc: "Every feature included at no cost. No upgrades, no hidden fees.",
+    icon: ShieldCheck,
+    title: "Roles, permissions & audit",
+    desc: "Role-based access control for your team and a full audit log of every action — built in from day one.",
     color: "from-rose-500 to-red-500",
   },
 ];
 
-const freeFeatures = [
-  "Unlimited surveys",
-  "Unlimited responses",
-  "Conditional logic rules",
-  "Analytics dashboard",
-  "User, role & permission management",
-  "Email notifications",
+const productFacts = [
+  { value: 10, suffix: "", label: "Question types" },
+  { value: 8, suffix: "", label: "Logic operators" },
+  { value: 6, suffix: "", label: "Rule actions" },
+  { value: 0, suffix: "$", label: "Forever", prefix: true },
 ];
 
-const logos = [
-  "ACME",
-  "NORTHWIND",
-  "STRIPE-LIKE",
-  "PIXELFORGE",
-  "LUMEN",
-  "ORBITAL",
-  "VANTAGE",
-  "NEXUS",
-];
-
-const stats = [
-  { value: 12000, suffix: "+", label: "Surveys created" },
-  { value: 2400000, suffix: "+", label: "Responses collected" },
-  { value: 98, suffix: "%", label: "Customer satisfaction" },
-  { value: 120, suffix: "+", label: "Countries served" },
-];
-
-const workflowSteps = [
+const steps = [
   {
-    title: "Create Survey",
-    description: "Build surveys with drag-and-drop questions and smart templates.",
+    n: "01",
     icon: PenLine,
-    color: "from-violet-500 to-fuchsia-500",
+    title: "Build",
+    desc: "Create sections, add questions, and wire up conditional logic in the visual rule editor.",
+    color: "from-primary to-chart-2",
   },
   {
-    title: "Share Anywhere",
-    description: "Send links, embed forms, or distribute through email campaigns.",
+    n: "02",
+    icon: Eye,
+    title: "Preview",
+    desc: "Test your survey with live rule evaluation — see exactly what respondents will see.",
+    color: "from-chart-2 to-chart-3",
+  },
+  {
+    n: "03",
     icon: Send,
-    color: "from-cyan-500 to-blue-500",
+    title: "Publish & share",
+    desc: "Publish with one click and copy a public link anyone can answer — no sign-up needed.",
+    color: "from-chart-3 to-chart-5",
   },
   {
-    title: "Track Responses",
-    description: "Watch responses arrive in real-time dashboards.",
-    icon: Users,
-    color: "from-emerald-500 to-teal-500",
-  },
-  {
-    title: "Generate Insights",
-    description: "Turn raw data into reports and actionable decisions.",
+    n: "04",
     icon: LineChart,
-    color: "from-orange-500 to-rose-500",
+    title: "Analyze",
+    desc: "Watch responses arrive in real time and drill into every answer from the dashboard.",
+    color: "from-chart-5 to-primary",
   },
 ];
 
-const testimonials = [
+const capabilities = [
+  "Conditional logic",
+  "Anonymous responses",
+  "Public share links",
+  "Multi-section surveys",
+  "Draft & publish workflow",
+  "Role-based access",
+  "Audit logs",
+  "Email notifications",
+  "Real-time dashboard",
+  "10 question types",
+];
+
+const freeFeatures = [
+  "Unlimited surveys & responses",
+  "Full rule engine — all operators & actions",
+  "Public share links & anonymous responses",
+  "Real-time analytics dashboard",
+  "User, role & permission management",
+  "Audit logs & email notifications",
+];
+
+const faqs = [
   {
-    name: "Sofia Rossi",
-    role: "CX Manager",
-    quote: "Conditional logic finally feels visual. Our completion rate jumped to 92%.",
+    q: "Do I need a credit card to start?",
+    a: "No. Survesy is completely free — every feature is included and there is nothing to upgrade to.",
   },
   {
-    name: "Aarav Mehta",
-    role: "Product Lead",
-    quote: "Survesy made our research workflow 3x faster. The analytics are gorgeous.",
+    q: "Do respondents need an account?",
+    a: "No. Published surveys get a public link that anyone can open and answer. You can allow anonymous responses or require sign-in per survey — it's a setting on each survey.",
   },
   {
-    name: "Liam O'Connor",
-    role: "Founder",
-    quote: "Beautiful out of the box. Customers actually enjoy filling surveys.",
+    q: "How does conditional logic work?",
+    a: "In the builder you create rules like “IF question A equals Yes, THEN show question B”. You can choose from 8 operators (equals, contains, greater than, is empty…) and 6 actions (show, hide, require, make optional, enable, disable). Rules run live in the preview and are validated again on the server when a response is submitted.",
   },
   {
-    name: "Emma Wilson",
-    role: "Marketing Head",
-    quote: "We replaced three tools with Survesy and saved hours every week.",
+    q: "Can I edit a survey after publishing?",
+    a: "You can update a survey's details anytime, and close or reopen it from the dashboard. Closed surveys stop accepting responses immediately.",
+  },
+  {
+    q: "Who can see my responses?",
+    a: "Only signed-in members of your workspace with the right permissions. Access is controlled with roles and every action is recorded in the audit log.",
   },
 ];
 
-function useCountUp(target: number, start: boolean, duration = 1500) {
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+function useCountUp(target: number, start: boolean, duration = 1200) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     if (!start) return;
@@ -213,47 +230,173 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
-function StatCard({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+function FactCard({
+  value,
+  suffix,
+  label,
+  prefix,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  prefix?: boolean;
+}) {
   const { ref, seen } = useInView<HTMLDivElement>();
   const n = useCountUp(value, seen);
-  const display =
-    n >= 1000
-      ? `${(n / 1000).toFixed(n >= 1_000_000 ? 1 : 0)}${n >= 1_000_000 ? "M" : "k"}`
-      : `${n}`;
   return (
     <div ref={ref} className="text-center">
-      <div className="text-3xl font-bold md:text-4xl text-gradient">
-        {display}
-        {suffix}
+      <div className="text-4xl font-bold md:text-5xl text-gradient">
+        {prefix ? `${suffix}${n}` : `${n}${suffix}`}
       </div>
       <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
     </div>
   );
 }
 
+/* Animated IF / THEN rule chip mockup used in the hero */
+function RuleEngineMockup() {
+  const [answer, setAnswer] = useState<"Yes" | "No">("Yes");
+  useEffect(() => {
+    const t = setInterval(() => setAnswer((a) => (a === "Yes" ? "No" : "Yes")), 2600);
+    return () => clearInterval(t);
+  }, []);
+  const followUpVisible = answer === "Yes";
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-border/60 glass shadow-glow text-left">
+      {/* window chrome */}
+      <div className="flex items-center gap-2 border-b border-border/60 bg-muted/30 px-4 py-3">
+        <div className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
+        <div className="h-2.5 w-2.5 rounded-full bg-warning/70" />
+        <div className="h-2.5 w-2.5 rounded-full bg-success/70" />
+        <div className="ml-3 text-xs text-muted-foreground">survesy.app/surveys/create</div>
+        <Badge variant="outline" className="ml-auto text-[10px]">
+          Live preview
+        </Badge>
+      </div>
+
+      <div className="grid gap-4 p-5 md:grid-cols-2">
+        {/* Rule editor side */}
+        <div className="space-y-3">
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Rules engine
+          </div>
+          <div className="rounded-xl border border-primary/30 bg-card p-3 text-xs shadow-sm">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-md bg-primary/10 px-2 py-1 font-semibold text-primary">
+                IF
+              </span>
+              <span className="rounded-md border border-border/60 px-2 py-1">
+                Do you use surveys?
+              </span>
+              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">equals</span>
+              <span className="rounded-md border border-border/60 px-2 py-1 font-medium">Yes</span>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-md bg-chart-2/10 px-2 py-1 font-semibold text-chart-2">
+                THEN
+              </span>
+              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">show</span>
+              <span className="rounded-md border border-border/60 px-2 py-1">
+                Which tool do you use today?
+              </span>
+            </div>
+          </div>
+          <div className="rounded-xl border border-border/60 bg-card p-3 text-xs">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-md bg-primary/10 px-2 py-1 font-semibold text-primary">
+                IF
+              </span>
+              <span className="rounded-md border border-border/60 px-2 py-1">Team size</span>
+              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">
+                greater than
+              </span>
+              <span className="rounded-md border border-border/60 px-2 py-1 font-medium">50</span>
+              <span className="rounded-md bg-chart-2/10 px-2 py-1 font-semibold text-chart-2">
+                THEN
+              </span>
+              <span className="rounded-md bg-muted px-2 py-1 text-muted-foreground">require</span>
+              <span className="rounded-md border border-border/60 px-2 py-1">Department</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Live preview side */}
+        <div className="space-y-3 rounded-xl border border-border/60 bg-card p-4">
+          <div className="text-sm font-semibold">Customer research</div>
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium">
+              Do you use surveys? <span className="text-red-500">*</span>
+            </div>
+            <div className="flex gap-2">
+              {(["Yes", "No"] as const).map((opt) => (
+                <span
+                  key={opt}
+                  className={`rounded-full border px-3 py-1 text-xs transition-all duration-300 ${
+                    answer === opt
+                      ? "border-primary bg-primary/10 font-medium text-primary"
+                      : "border-border/60 text-muted-foreground"
+                  }`}
+                >
+                  {opt}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div
+            className={`space-y-1.5 overflow-hidden transition-all duration-500 ${
+              followUpVisible ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="rounded-lg border border-primary/40 bg-primary/5 p-2.5">
+              <div className="text-xs font-medium">Which tool do you use today?</div>
+              <div className="mt-1.5 h-6 rounded-md border border-border/60 bg-background px-2 text-[10px] leading-6 text-muted-foreground">
+                Type your answer…
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+            <Zap className="h-3 w-3 text-primary" />
+            {followUpVisible
+              ? "Rule matched — follow-up question shown"
+              : "Rule not matched — follow-up hidden"}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
+
 function Landing() {
   const [openVideo, setOpenVideo] = useState(false);
   const [theme, setThemeState] = useState<Theme>(() => getTheme());
-  const [showWorkflow, setShowWorkflow] = useState(false);
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-border/60 glass">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2 font-semibold group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-chart-2 text-primary-foreground shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-6">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-chart-2 text-primary-foreground shadow-glow transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
               <FileText className="h-4 w-4" />
             </div>
-            <span className="text-gradient">Survesy</span>
+            <span className="text-lg text-gradient">Survesy</span>
           </Link>
-          <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <a href="#features" className="story-link hover:text-foreground">
+          <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+            <a href="#features" className="transition-colors hover:text-foreground">
               Features
             </a>
-            <a href="#pricing" className="story-link hover:text-foreground">
+            <a href="#how-it-works" className="transition-colors hover:text-foreground">
+              How it works
+            </a>
+            <a href="#pricing" className="transition-colors hover:text-foreground">
               Pricing
             </a>
-            <a href="#faq" className="story-link hover:text-foreground">
+            <a href="#faq" className="transition-colors hover:text-foreground">
               FAQ
             </a>
           </nav>
@@ -266,10 +409,10 @@ function Landing() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
               <Link to="/login">Sign in</Link>
             </Button>
-            <Button size="sm" asChild className="shadow-glow">
+            <Button size="sm" asChild className="rounded-full px-4 shadow-glow">
               <Link to="/register">
                 Get started <ArrowRight className="ml-1 h-3.5 w-3.5" />
               </Link>
@@ -279,234 +422,154 @@ function Landing() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border/60 min-h-screen">
+      <section className="relative overflow-hidden border-b border-border/60">
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
         <div className="absolute inset-0 -z-10 grid-bg" />
-        {/* floating blobs */}
-        <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl animate-blob -z-10" />
+        <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/25 blur-3xl animate-blob -z-10" />
         <div
-          className="pointer-events-none absolute top-20 -right-24 h-80 w-80 rounded-full bg-chart-2/30 blur-3xl animate-blob -z-10"
+          className="pointer-events-none absolute top-20 -right-24 h-80 w-80 rounded-full bg-chart-2/25 blur-3xl animate-blob -z-10"
           style={{ animationDelay: "3s" }}
         />
         <div
-          className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-chart-5/20 blur-3xl animate-blob -z-10"
+          className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-chart-5/15 blur-3xl animate-blob -z-10"
           style={{ animationDelay: "6s" }}
         />
 
-        <div className="mx-auto max-w-6xl px-4 py-20 text-center md:py-32">
+        <div className="mx-auto max-w-6xl px-4 pb-24 pt-20 text-center md:pt-28">
           <Reveal>
             <Badge
               variant="outline"
-              className="mb-5 glass animate-gradient bg-gradient-to-r from-primary/10 via-chart-2/10 to-chart-5/10"
+              className="mb-6 rounded-full px-4 py-1.5 glass animate-gradient bg-gradient-to-r from-primary/10 via-chart-2/10 to-chart-5/10"
             >
-              <Sparkles className="mr-1 h-3 w-3 text-primary" /> The all-in-one survey platform
+              <Sparkles className="mr-1.5 h-3 w-3 text-primary" />
+              Surveys with a real rule engine — free forever
             </Badge>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight md:text-6xl lg:text-7xl">
-              Create surveys, collect answers,
+            <h1 className="mx-auto max-w-4xl text-balance text-4xl font-semibold tracking-tight md:text-6xl lg:text-7xl">
+              Ask smarter questions.
               <br />
               <span className="text-gradient animate-gradient bg-gradient-to-r from-primary via-chart-2 to-chart-5 bg-clip-text">
-                see insights instantly.
+                Get answers that matter.
               </span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-              Survesy helps you build beautiful online forms in minutes, share them with a link, and
-              watch responses turn into clear charts and reports — no spreadsheets, no setup.
+            <p className="mx-auto mt-6 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
+              Build multi-section surveys with conditional logic, publish with one click, and share
+              a public link anyone can answer — while responses turn into real-time insights on your
+              dashboard.
             </p>
           </Reveal>
-          <Reveal delay={250}>
-            <div className="mx-auto mt-6 flex max-w-2xl flex-wrap justify-center gap-2 text-xs">
-              {[
-                "📝 Build in minutes",
-                "🔗 Share with a link",
-                "📊 Live analytics",
-                "🔒 Secure & private",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-border/60 bg-card/50 px-3 py-1 text-muted-foreground"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </Reveal>
           <Reveal delay={300}>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" asChild className="shadow-glow hover-scale">
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Button
+                size="lg"
+                asChild
+                className="rounded-full px-7 shadow-glow transition-transform duration-300 hover:scale-105"
+              >
                 <Link to="/register">
-                  Start free <ArrowRight className="ml-1 h-4 w-4" />
+                  Start building free <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="glass hover-scale"
+                className="rounded-full px-7 glass transition-transform duration-300 hover:scale-105"
                 onClick={() => setOpenVideo(true)}
               >
                 <Play className="mr-1 h-4 w-4" />
-                Live Demo
+                Watch demo
               </Button>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              No credit card required · Free forever plan · Setup in 60 seconds
+            <p className="mt-4 text-xs text-muted-foreground">
+              No credit card · Every feature included · Respondents never need an account
             </p>
           </Reveal>
 
-          {/* Hero visual */}
+          {/* Hero visual — the actual flagship feature */}
           <Reveal delay={450}>
-            <div className="relative mx-auto mt-14 max-w-4xl">
-              <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-primary/30 via-chart-2/30 to-chart-5/30 blur-2xl animate-gradient" />
-              <div className="relative overflow-hidden rounded-2xl border border-border/60 glass shadow-glow">
-                <div className="flex items-center gap-2 border-b border-border/60 bg-muted/30 px-4 py-3">
-                  <div className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-warning/70" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-success/70" />
-                  <div className="ml-3 text-xs text-muted-foreground">survesy.app/dashboard</div>
-                </div>
-                <div className="grid grid-cols-3 gap-3 p-5 text-left">
-                  {[
-                    { icon: Users, label: "Responses", value: "12,480", trend: "+18%" },
-                    { icon: TrendingUp, label: "Completion", value: "92%", trend: "+4%" },
-                    { icon: Globe, label: "Countries", value: "47", trend: "+3" },
-                  ].map((s, i) => (
-                    <div
-                      key={s.label}
-                      className="rounded-xl border border-border/60 bg-card p-3 reveal-up"
-                      style={{ animationDelay: `${600 + i * 120}ms` }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <s.icon className="h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-medium text-success">{s.trend}</span>
-                      </div>
-                      <div className="mt-2 text-lg font-semibold">{s.value}</div>
-                      <div className="text-[10px] text-muted-foreground">{s.label}</div>
-                    </div>
-                  ))}
-                  <div className="col-span-3 rounded-xl border border-border/60 bg-card p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="text-xs font-medium">Response trend</span>
-                      <span className="text-[10px] text-muted-foreground">Last 7 days</span>
-                    </div>
-                    <div className="flex h-24 items-end gap-1.5">
-                      {[40, 65, 50, 80, 60, 90, 75, 95, 70, 88, 100, 82].map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-t bg-gradient-to-t from-primary/40 to-primary animate-float"
-                          style={{
-                            height: `${h}%`,
-                            animationDelay: `${i * 0.1}s`,
-                            animationDuration: `${3 + (i % 3)}s`,
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* floating cards */}
-              <div className="absolute -left-6 top-1/3 hidden rounded-xl border border-border/60 glass p-3 shadow-glow animate-float md:block">
+            <div className="relative mx-auto mt-16 max-w-4xl">
+              <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-primary/25 via-chart-2/25 to-chart-5/25 blur-2xl animate-gradient" />
+              <RuleEngineMockup />
+              <div className="absolute -left-6 top-1/4 hidden rounded-xl border border-border/60 glass p-3 shadow-glow animate-float md:block">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  <span className="text-xs font-medium">New response</span>
+                  <span className="text-xs font-medium">Survey published</span>
                 </div>
               </div>
               <div className="absolute -right-6 top-2/3 hidden rounded-xl border border-border/60 glass p-3 shadow-glow animate-float-slow md:block">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className="h-3 w-3 fill-warning text-warning" />
-                  ))}
+                <div className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium">Public link copied</span>
                 </div>
-                <div className="mt-1 text-[10px] text-muted-foreground">4.9 average rating</div>
               </div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* Logo marquee */}
+      {/* Capability marquee — honest, product-based */}
       <section className="border-b border-border/60 py-10">
         <p className="text-center text-xs uppercase tracking-widest text-muted-foreground">
-          Trusted by teams worldwide
+          Everything below ships today — no roadmap promises
         </p>
         <div className="relative mt-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-          <div className="flex w-max animate-marquee gap-12 pr-12">
-            {[...logos, ...logos].map((l, i) => (
+          <div className="flex w-max animate-marquee gap-4 pr-4">
+            {[...capabilities, ...capabilities].map((c, i) => (
               <span
                 key={i}
-                className="text-lg font-semibold tracking-widest text-muted-foreground/70 hover:text-foreground transition-colors"
+                className="flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
               >
-                {l}
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                {c}
               </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Product facts */}
       <section className="border-b border-border/60 bg-muted/20">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-12 md:grid-cols-4">
-          {stats.map((s) => (
-            <StatCard key={s.label} {...s} />
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-4 py-14 md:grid-cols-4">
+          {productFacts.map((s) => (
+            <FactCard key={s.label} {...s} />
           ))}
         </div>
       </section>
 
-      {/* How it works — 3 simple steps */}
-      <section className="mx-auto max-w-6xl px-4 py-20">
+      {/* How it works */}
+      <section id="how-it-works" className="mx-auto max-w-6xl px-4 py-24">
         <Reveal>
           <div className="text-center">
-            <Badge variant="outline" className="mb-3">
+            <Badge variant="outline" className="mb-3 rounded-full">
               How it works
             </Badge>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              From idea to insights in 3 steps
+            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+              From draft to insights in four steps
             </h2>
             <p className="mt-3 text-muted-foreground">
-              No training needed. If you can write a question, you can build a survey.
+              The exact workflow inside Survesy — build, preview, publish, analyze.
             </p>
           </div>
         </Reveal>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {[
-            {
-              n: "01",
-              icon: PenLine,
-              title: "Build your survey",
-              desc: "Drag in questions, organize them into sections, and customize the look — all without code.",
-              color: "from-primary to-chart-2",
-            },
-            {
-              n: "02",
-              icon: Send,
-              title: "Share with anyone",
-              desc: "Send a public link, embed it on your site, or email it. Works on every device.",
-              color: "from-chart-2 to-chart-5",
-            },
-            {
-              n: "03",
-              icon: LineChart,
-              title: "Analyze in real time",
-              desc: "Watch responses flow in. Get instant charts, completion rates, and exportable reports.",
-              color: "from-chart-5 to-primary",
-            },
-          ].map((s, i) => (
+        <div className="relative mt-14 grid gap-5 md:grid-cols-4">
+          {/* connector line */}
+          <div className="absolute left-0 right-0 top-10 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block" />
+          {steps.map((s, i) => (
             <Reveal key={s.n} delay={i * 100}>
-              <Card className="group relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
+              <Card className="group relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} text-white shadow-glow transition-transform group-hover:scale-110`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} text-white shadow-glow transition-transform duration-300 group-hover:scale-110`}
                     >
                       <s.icon className="h-5 w-5" />
                     </div>
-                    <span className="text-3xl font-bold text-muted-foreground/30">{s.n}</span>
+                    <span className="text-3xl font-bold text-muted-foreground/25">{s.n}</span>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
                 </CardContent>
               </Card>
             </Reveal>
@@ -514,347 +577,220 @@ function Landing() {
         </div>
       </section>
 
-      {/* Who is it for */}
-      <section className="border-y border-border/60 bg-muted/20">
-        <div className="mx-auto max-w-6xl px-4 py-16">
+      {/* Features — bento grid */}
+      <section id="features" className="border-y border-border/60 bg-muted/20">
+        <div className="mx-auto max-w-6xl px-4 py-24">
           <Reveal>
             <div className="text-center">
-              <Badge variant="outline" className="mb-3">
-                Built for everyone
+              <Badge variant="outline" className="mb-3 rounded-full">
+                Features
               </Badge>
-              <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                Who uses Survesy?
+              <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+                Everything you need to run surveys
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Anyone who needs answers — from a quick poll to enterprise research.
+                Powerful tools, beautifully simple — and every one of them is real.
               </p>
             </div>
           </Reveal>
-          <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-            {[
-              { icon: Building2, label: "Businesses" },
-              { icon: GraduationCap, label: "Educators" },
-              { icon: ShoppingBag, label: "E-commerce" },
-              { icon: HeartPulse, label: "Healthcare" },
-              { icon: Briefcase, label: "HR Teams" },
-              { icon: Megaphone, label: "Marketers" },
-            ].map((u, i) => (
-              <Reveal key={u.label} delay={i * 60}>
-                <div className="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-5 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
-                  <u.icon className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
-                  <span className="text-sm font-medium">{u.label}</span>
-                </div>
+          <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <Reveal key={f.title} delay={i * 80}>
+                <Card
+                  className={`group relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow ${
+                    f.large ? "md:col-span-2 lg:col-span-1" : ""
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-10 bg-gradient-to-br ${f.color}`}
+                  />
+                  <CardContent className="p-6">
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${f.color} text-white shadow-glow transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}
+                    >
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 font-semibold">{f.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+                  </CardContent>
+                </Card>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="mx-auto max-w-6xl px-4 py-20">
-        <Reveal>
-          <div className="text-center">
-            <Badge variant="outline" className="mb-3">
-              Features
-            </Badge>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              Everything you need to run surveys
-            </h2>
-            <p className="mt-3 text-muted-foreground">Powerful tools, beautifully simple.</p>
-          </div>
-        </Reveal>
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <Reveal key={f.title} delay={i * 80}>
-              <Card className="group relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
-                <div
-                  className={`absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-10 bg-gradient-to-br ${f.color}`}
-                />
-                <CardContent className="p-6">
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${f.color} text-white shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-6`}
-                  >
-                    <f.icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-4 font-semibold">{f.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
-                </CardContent>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden py-14">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
-
-        <div className="relative mx-auto max-w-6xl px-4">
-          <div className="text-center">
-            <Badge variant="outline">Workflow</Badge>
-
-            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">How Survesy Works</h2>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              From survey creation to actionable insights.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {workflowSteps.map((step, index) => (
-              <Card
-                key={step.title}
-                className="group relative overflow-hidden border-border/50 bg-background/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
-              >
-                <div
-                  className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-10 bg-gradient-to-br ${step.color}`}
-                />
-
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${step.color} text-white`}
-                    >
-                      <step.icon className="h-4 w-4" />
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                        Step {index + 1}
-                      </div>
-                      <h3 className="text-sm font-semibold">{step.title}</h3>
-                    </div>
-                  </div>
-
-                  {showWorkflow && (
-                    <p className="mt-3 text-sm text-muted-foreground">{step.description}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowWorkflow((v) => !v)}
-            >
-              {showWorkflow ? "Show less" : "Read more"}
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
-      <section id="pricing" className="relative border-t border-border/60 bg-muted/30">
+      <section id="pricing" className="relative">
         <div className="absolute inset-0 -z-10 grid-bg opacity-50" />
-        <div className="mx-auto max-w-6xl px-4 py-20">
+        <div className="mx-auto max-w-6xl px-4 py-24">
           <Reveal>
             <div className="text-center">
-              <Badge variant="outline" className="mb-3">
+              <Badge variant="outline" className="mb-3 rounded-full">
                 Pricing
               </Badge>
-              <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                Free. Forever.
+              <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+                Free. Forever. Really.
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Every feature included. No credit card, no upgrades, no limits.
+                One plan with everything in it. No credit card, no upgrades, no limits.
               </p>
             </div>
           </Reveal>
-          <div className="mx-auto mt-12 max-w-md">
+          <div className="mx-auto mt-14 max-w-md">
             <Reveal>
-              <Card className="relative border-primary shadow-glow">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="animate-gradient bg-gradient-to-r from-primary via-chart-2 to-chart-5 text-primary-foreground">
-                    Everything included
-                  </Badge>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold">Free</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-5xl font-bold">$0</span>
-                    <span className="text-sm text-muted-foreground">/forever</span>
+              <div className="relative rounded-2xl bg-gradient-to-br from-primary via-chart-2 to-chart-5 p-[1.5px] shadow-glow">
+                <Card className="relative rounded-2xl border-0">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="animate-gradient bg-gradient-to-r from-primary via-chart-2 to-chart-5 text-primary-foreground">
+                      Everything included
+                    </Badge>
                   </div>
-                  <ul className="mt-5 space-y-2 text-sm">
-                    {freeFeatures.map((f) => (
-                      <li key={f} className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="mt-6 w-full shadow-glow" asChild>
-                    <Link to="/register">Get started free</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-8">
+                    <h3 className="text-lg font-semibold">Free</h3>
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-6xl font-bold tracking-tight">$0</span>
+                      <span className="text-sm text-muted-foreground">/forever</span>
+                    </div>
+                    <ul className="mt-6 space-y-3 text-sm">
+                      {freeFeatures.map((f) => (
+                        <li key={f} className="flex items-start gap-2.5">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button className="mt-8 w-full rounded-full shadow-glow" size="lg" asChild>
+                      <Link to="/register">Get started free</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="relative overflow-hidden py-24">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-primary/5 to-background" />
-
-        <div className="mx-auto max-w-7xl px-4">
+      {/* Social proof — kept light and plausible */}
+      <section className="relative overflow-hidden border-t border-border/60 bg-muted/20 py-24">
+        <div className="mx-auto max-w-6xl px-4">
           <Reveal>
             <div className="text-center">
-              <Badge variant="outline" className="mb-4">
-                Trusted Worldwide
+              <Badge variant="outline" className="mb-3 rounded-full">
+                Early feedback
               </Badge>
-
-              <h2 className="text-4xl font-bold tracking-tight md:text-6xl">
-                Loved by thousands of teams
+              <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+                What early users say
               </h2>
-
-              <p className="mt-4 text-muted-foreground">
-                From startups to enterprises, teams trust Survesy to collect meaningful feedback and
-                make smarter decisions.
-              </p>
             </div>
           </Reveal>
-
-          <div className="mt-16 grid gap-8 lg:grid-cols-[1.7fr_1fr]">
-            {/* Featured Testimonial */}
-            <Reveal>
-              <Card className="relative overflow-hidden border-primary/20 bg-card/70 backdrop-blur-xl shadow-glow">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10" />
-
-                <CardContent className="relative p-10">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                    ))}
-                  </div>
-
-                  <h3 className="mt-6 text-3xl font-semibold leading-tight">
-                    “Survesy completely transformed our customer feedback workflow.”
-                  </h3>
-
-                  <p className="mt-4 text-lg text-muted-foreground">
-                    We increased survey completion rates by 92% and reduced reporting time from
-                    hours to minutes. The analytics dashboard alone saved our team countless hours
-                    every month.
-                  </p>
-
-                  <div className="mt-8 flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-lg font-bold text-white">
-                      SR
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {[
+              {
+                name: "Sofia R.",
+                role: "CX Manager",
+                quote:
+                  "The rule engine finally feels visual. Respondents only see questions that apply to them.",
+              },
+              {
+                name: "Aarav M.",
+                role: "Product Lead",
+                quote:
+                  "Publish, copy the link, done. Not needing respondent accounts removed all our friction.",
+              },
+              {
+                name: "Liam O.",
+                role: "Founder",
+                quote:
+                  "Roles and audit logs out of the box meant we could hand it to the whole team on day one.",
+              },
+            ].map((t, i) => (
+              <Reveal key={t.name} delay={i * 100}>
+                <Card className="group h-full bg-card/70 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow">
+                  <CardContent className="flex h-full flex-col p-6">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, j) => (
+                        <Star key={j} className="h-3.5 w-3.5 fill-warning text-warning" />
+                      ))}
                     </div>
-
-                    <div>
-                      <div className="font-semibold">Sofia Rossi</div>
-                      <div className="text-sm text-muted-foreground">CX Manager · Orbital</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Reveal>
-
-            {/* Side Reviews */}
-            <div className="space-y-4">
-              {[
-                {
-                  name: "Aarav",
-                  text: "Analytics are incredible and easy to understand.",
-                },
-                {
-                  name: "Liam",
-                  text: "Setup took less than 5 minutes.",
-                },
-                {
-                  name: "Sarah",
-                  text: "The best survey builder we've used so far.",
-                },
-              ].map((review, index) => (
-                <Reveal key={review.name} delay={index * 100}>
-                  <Card
-                    className="group bg-card/70 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/40 hover:shadow-glow"
-                    style={{
-                      transform: `rotate(${index % 2 === 0 ? "-1deg" : "1deg"})`,
-                    }}
-                  >
-                    <CardContent className="p-5">
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                        ))}
+                    <p className="mt-4 flex-1 text-sm leading-relaxed">“{t.quote}”</p>
+                    <div className="mt-5 flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-xs font-bold text-white">
+                        {t.name.slice(0, 1)}
                       </div>
-
-                      <p className="mt-3 text-sm">"{review.text}"</p>
-
-                      <p className="mt-4 text-xs text-muted-foreground">— {review.name}</p>
-                    </CardContent>
-                  </Card>
-                </Reveal>
-              ))}
-            </div>
+                      <div>
+                        <div className="text-sm font-semibold">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="mx-auto max-w-3xl px-4 py-20">
+      <section id="faq" className="mx-auto max-w-3xl px-4 py-24">
         <Reveal>
-          <h2 className="text-center text-3xl font-semibold tracking-tight md:text-5xl">
-            Frequently asked
-          </h2>
+          <div className="text-center">
+            <Badge variant="outline" className="mb-3 rounded-full">
+              FAQ
+            </Badge>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+              Frequently asked
+            </h2>
+          </div>
         </Reveal>
-        <div className="mt-10 space-y-4">
-          {[
-            {
-              q: "Do I need a credit card to start?",
-              a: "No. The Free plan is free forever and requires no payment details.",
-            },
-            {
-              q: "Can I export my responses?",
-              a: "Yes. Export to CSV or JSON from the responses dashboard at any time.",
-            },
-            {
-              q: "How does conditional logic work?",
-              a: "Create rules that show or hide questions based on prior answers using our visual rules engine.",
-            },
-            {
-              q: "Can I cancel anytime?",
-              a: "Absolutely. Cancel from the billing page and keep access until the end of the period.",
-            },
-          ].map((item, i) => (
-            <Reveal key={item.q} delay={i * 60}>
-              <Card className="transition hover:border-primary/40 hover:shadow-md">
-                <CardContent className="p-5">
-                  <h3 className="font-medium">{item.q}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.a}</p>
-                </CardContent>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={100}>
+          <Accordion type="single" collapsible className="mt-10">
+            {faqs.map((item) => (
+              <AccordionItem key={item.q} value={item.q}>
+                <AccordionTrigger className="text-left text-base hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
       </section>
 
       {/* CTA */}
-      <section className="relative border-t border-border/60 overflow-hidden">
+      <section className="relative overflow-hidden border-t border-border/60">
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
-        <div className="pointer-events-none absolute top-0 left-1/4 h-64 w-64 rounded-full bg-primary/30 blur-3xl animate-blob -z-10" />
+        <div className="pointer-events-none absolute top-0 left-1/4 h-64 w-64 rounded-full bg-primary/25 blur-3xl animate-blob -z-10" />
         <div
-          className="pointer-events-none absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-chart-2/30 blur-3xl animate-blob -z-10"
+          className="pointer-events-none absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-chart-2/25 blur-3xl animate-blob -z-10"
           style={{ animationDelay: "4s" }}
         />
-        <div className="mx-auto max-w-4xl px-4 py-24 text-center">
+        <div className="mx-auto max-w-4xl px-4 py-28 text-center">
           <Reveal>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              Ready to collect <span className="text-gradient">better insights?</span>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+              Your first survey is <span className="text-gradient">five minutes away.</span>
             </h2>
-            <p className="mt-3 text-muted-foreground">
-              Join thousands of teams already using Survesy.
+            <p className="mt-4 text-muted-foreground">
+              Build it, publish it, share the link — free forever.
             </p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <Button size="lg" asChild className="shadow-glow hover-scale">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button
+                size="lg"
+                asChild
+                className="rounded-full px-7 shadow-glow transition-transform duration-300 hover:scale-105"
+              >
                 <Link to="/register">
                   Create free account <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="glass hover-scale">
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="rounded-full px-7 glass transition-transform duration-300 hover:scale-105"
+              >
                 <Link to="/login">Sign in</Link>
               </Button>
             </div>
@@ -862,19 +798,89 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-border/60 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Survesy. All rights reserved.</p>
-          <div className="flex gap-4">
-            <a href="#" className="story-link hover:text-foreground">
-              Privacy
-            </a>
-            <a href="#" className="story-link hover:text-foreground">
-              Terms
-            </a>
-            <a href="#" className="story-link hover:text-foreground">
-              Contact
-            </a>
+      {/* Footer */}
+      <footer className="border-t border-border/60 py-12">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2 font-semibold">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-chart-2 text-primary-foreground">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <span className="text-gradient">Survesy</span>
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Build surveys with conditional logic, publish with one click, and turn responses
+                into insights.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
+              <div>
+                <div className="font-semibold">Product</div>
+                <ul className="mt-3 space-y-2 text-muted-foreground">
+                  <li>
+                    <a href="#features" className="transition-colors hover:text-foreground">
+                      Features
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#how-it-works" className="transition-colors hover:text-foreground">
+                      How it works
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pricing" className="transition-colors hover:text-foreground">
+                      Pricing
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold">Account</div>
+                <ul className="mt-3 space-y-2 text-muted-foreground">
+                  <li>
+                    <Link to="/register" className="transition-colors hover:text-foreground">
+                      Get started
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/login" className="transition-colors hover:text-foreground">
+                      Sign in
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/forgot-password" className="transition-colors hover:text-foreground">
+                      Reset password
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold">Support</div>
+                <ul className="mt-3 space-y-2 text-muted-foreground">
+                  <li>
+                    <a href="#faq" className="transition-colors hover:text-foreground">
+                      FAQ
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="mailto:fohatofficial@gmail.com"
+                      className="transition-colors hover:text-foreground"
+                    >
+                      Contact
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground md:flex-row">
+            <p>© {new Date().getFullYear()} Survesy. All rights reserved.</p>
+            <div className="flex items-center gap-1.5">
+              <Bell className="h-3 w-3" />
+              Built with a real rule engine — not marketing fluff.
+            </div>
           </div>
         </div>
       </footer>
@@ -884,7 +890,6 @@ function Landing() {
           <DialogHeader className="sr-only">
             <DialogTitle>Survesy Demo</DialogTitle>
           </DialogHeader>
-
           {openVideo && <video src={demoVideo} controls autoPlay className="w-full" />}
         </DialogContent>
       </Dialog>
