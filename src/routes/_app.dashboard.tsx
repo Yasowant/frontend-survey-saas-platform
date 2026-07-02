@@ -423,7 +423,7 @@ function Dashboard() {
             <div className="py-10 text-center text-sm text-muted-foreground">No activity found</div>
           ) : (
             <div className="space-y-5">
-              {activity.map((item) => (
+              {activity.map((item: { id: string; action: string; createdAt: string }) => (
                 <div key={item.id} className="relative border-l-2 border-primary/30 pl-4">
                   <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-primary" />
 

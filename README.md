@@ -6,6 +6,8 @@ The application enables administrators to create surveys, manage responses, view
 
 ---
 
+> **100% free platform** — every feature is included, with no subscription, billing, or payment module.
+
 ## Features
 
 ### Authentication & Authorization

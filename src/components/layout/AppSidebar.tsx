@@ -8,8 +8,6 @@ import {
   MessageSquare,
   BarChart3,
   CreditCard,
-  Receipt,
-  ArrowUpCircle,
   Bell,
   ScrollText,
   Settings,
@@ -19,7 +17,6 @@ import {
   Users,
   Shield,
   KeyRound,
-  Package,
 } from "lucide-react";
 
 import {
@@ -109,27 +106,12 @@ const sections = [
     ],
   },
   {
-    label: "Subscriptions",
+    label: "Plan",
     items: [
       {
-        title: "Current Plan",
+        title: "Your Plan (Free)",
         url: "/subscription",
         icon: CreditCard,
-      },
-      {
-        title: "Plans",
-        url: "/plans",
-        icon: Package,
-      },
-      {
-        title: "Billing History",
-        url: "/billing",
-        icon: Receipt,
-      },
-      {
-        title: "Upgrade Plan",
-        url: "/upgrade",
-        icon: ArrowUpCircle,
       },
     ],
   },

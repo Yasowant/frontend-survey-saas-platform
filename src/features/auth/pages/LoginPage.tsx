@@ -19,8 +19,8 @@ export function LoginPage() {
           </h1>
 
           <p className="mt-4 max-w-md text-primary-foreground/80">
-            Enterprise-grade survey management, response analytics, and subscription billing — all
-            in one place.
+            Enterprise-grade survey management, response analytics, and team access control — all
+            in one place. Completely free.
           </p>
         </div>
 

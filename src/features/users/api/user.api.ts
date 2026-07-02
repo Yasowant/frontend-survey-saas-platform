@@ -11,3 +11,9 @@ export const getUserById = async (id: string) => {
 
   return response.data;
 };
+
+export const uploadAvatar = async (image: string) => {
+  const response = await api.patch("/users/me/avatar", { image });
+
+  return response.data;
+};

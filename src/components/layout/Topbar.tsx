@@ -1,6 +1,7 @@
-import { Bell, Moon, Search, LogOut, User2, Settings } from "lucide-react";
+import { Bell, Moon, Sun, Search, LogOut, User2, Settings } from "lucide-react";
 
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,17 +16,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Badge } from "@/components/ui/badge";
 
 import { useState } from "react";
 import { authService } from "@/features/auth/services/auth.service";
+import { useProfile } from "@/features/auth/hooks/userProfile";
+import { getNotifications } from "@/features/notifications/api/notification.api";
+import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
 
 export function Topbar() {
   const navigate = useNavigate();
 
-  const [unread] = useState(0);
+  const [theme, setThemeState] = useState<Theme>(() => getTheme());
+
+  const { data: profileData } = useProfile();
+  const avatarUrl = profileData?.data?.data?.avatarUrl || "";
+
+  const { data: notifData } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: getNotifications,
+    refetchInterval: 60_000,
+  });
+
+  const unread = (notifData?.data ?? []).filter(
+    (n: { read: boolean }) => !n.read,
+  ).length;
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -67,8 +84,13 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-1">
-        <Button variant="ghost" size="icon" disabled aria-label="Theme">
-          <Moon className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Toggle light/dark mode"
+          onClick={() => setThemeState(toggleTheme())}
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 
         <Button variant="ghost" size="icon" asChild className="relative">
@@ -87,6 +109,7 @@ export function Topbar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile" />}
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   {initials}
                 </AvatarFallback>

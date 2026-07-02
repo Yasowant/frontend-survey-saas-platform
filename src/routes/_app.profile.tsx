@@ -1,17 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 import { toast } from "sonner";
 
 import { useProfile } from "@/features/auth/hooks/userProfile";
+import { uploadAvatar } from "@/features/users/api/user.api";
 
 export const Route = createFileRoute("/_app/profile")({
   component: Profile,
@@ -30,6 +32,40 @@ function Profile() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  const avatarMutation = useMutation({
+    mutationFn: uploadAvatar,
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+
+      // keep topbar avatar in sync
+      const stored = JSON.parse(localStorage.getItem("user") || "{}");
+      const avatarUrl = res?.data?.avatarUrl;
+      if (avatarUrl) {
+        localStorage.setItem("user", JSON.stringify({ ...stored, avatarUrl }));
+      }
+
+      toast.success("Profile picture updated");
+    },
+    onError: () => toast.error("Failed to upload profile picture"),
+  });
+
+  const handleAvatarFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      return toast.error("Please select an image file");
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error("Image must be under 5MB");
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => avatarMutation.mutate(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (!profile) return;
@@ -97,6 +133,9 @@ function Profile() {
         <CardContent className="pt-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-center">
             <Avatar className="h-24 w-24">
+              {profile?.avatarUrl && (
+                <AvatarImage src={profile.avatarUrl} alt="Profile picture" />
+              )}
               <AvatarFallback className="text-2xl font-bold">{initials}</AvatarFallback>
             </Avatar>
 
@@ -116,7 +155,25 @@ function Profile() {
               </div>
             </div>
 
-            <Button variant="outline">Upload Avatar</Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAvatarFile(file);
+                e.target.value = "";
+              }}
+            />
+
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarMutation.isPending}
+            >
+              {avatarMutation.isPending ? "Uploading…" : "Upload Avatar"}
+            </Button>
           </div>
         </CardContent>
       </Card>

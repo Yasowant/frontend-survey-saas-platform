@@ -1,27 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { KEYS, read, write } from "@/lib/storage";
+import {
+  getSettings,
+  updateSettings,
+  type ApiSettings,
+} from "@/features/settings/api/settings.api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/settings")({ component: Settings });
 
-interface S {
-  workspaceName: string;
-  defaultLanguage: string;
-  allowAnonymous: boolean;
-  requireEmail: boolean;
-  emailNotifs: boolean;
-  pushNotifs: boolean;
-  twoFactor: boolean;
-}
-const DEFAULTS: S = {
-  workspaceName: "Acme Inc",
+const DEFAULTS: ApiSettings = {
+  workspaceName: "My Workspace",
   defaultLanguage: "English",
   allowAnonymous: true,
   requireEmail: false,
@@ -31,11 +27,35 @@ const DEFAULTS: S = {
 };
 
 function Settings() {
-  const [s, setS] = useState<S>(() => read<S>(KEYS.settings, DEFAULTS));
-  const save = () => {
-    write(KEYS.settings, s);
-    toast.success("Settings saved");
-  };
+  const queryClient = useQueryClient();
+  const [s, setS] = useState<ApiSettings>(DEFAULTS);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: getSettings,
+  });
+
+  useEffect(() => {
+    if (data?.data) {
+      setS({ ...DEFAULTS, ...data.data });
+    }
+  }, [data]);
+
+  const saveMutation = useMutation({
+    mutationFn: updateSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      toast.success("Settings saved");
+    },
+    onError: () => toast.error("Failed to save settings"),
+  });
+
+  const save = () => saveMutation.mutate(s);
+  const saving = saveMutation.isPending;
+
+  if (isLoading) {
+    return <div className="p-6 text-sm text-muted-foreground">Loading settings…</div>;
+  }
 
   return (
     <div className="space-y-5">
@@ -46,7 +66,6 @@ function Settings() {
           <TabsTrigger value="surveys">Surveys</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="theme">Theme</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -69,7 +88,7 @@ function Settings() {
                   onChange={(e) => setS({ ...s, defaultLanguage: e.target.value })}
                 />
               </div>
-              <Button onClick={save}>Save</Button>
+              <Button onClick={save} disabled={saving}>Save</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -94,7 +113,7 @@ function Settings() {
                   onCheckedChange={(v) => setS({ ...s, requireEmail: v })}
                 />
               </div>
-              <Button onClick={save}>Save</Button>
+              <Button onClick={save} disabled={saving}>Save</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -119,7 +138,7 @@ function Settings() {
                   onCheckedChange={(v) => setS({ ...s, pushNotifs: v })}
                 />
               </div>
-              <Button onClick={save}>Save</Button>
+              <Button onClick={save} disabled={saving}>Save</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -138,32 +157,8 @@ function Settings() {
                   onCheckedChange={(v) => setS({ ...s, twoFactor: v })}
                 />
               </div>
-              <Button onClick={save}>Save</Button>
+              <Button onClick={save} disabled={saving}>Save</Button>
             </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="theme">
-          <Card>
-            <CardHeader>
-              <CardTitle>Theme</CardTitle>
-            </CardHeader>
-            {/* <CardContent className="space-y-3">
-              <div className="flex gap-2">
-                <Button
-                  variant={theme === "light" ? "default" : "outline"}
-                  onClick={() => setTheme("light")}
-                >
-                  Light
-                </Button>
-                <Button
-                  variant={theme === "dark" ? "default" : "outline"}
-                  onClick={() => setTheme("dark")}
-                >
-                  Dark
-                </Button>
-              </div>
-            </CardContent> */}
           </Card>
         </TabsContent>
       </Tabs>

@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { applyTheme, getTheme } from "../lib/theme";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -78,20 +79,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Survesy — Survey & Subscription Platform" },
-      { name: "description", content: "Enterprise survey management and subscription platform." },
+      { title: "Survesy — Free Survey Platform" },
+      { name: "description", content: "Free enterprise-grade survey management and analytics platform." },
       { name: "author", content: "Survesy" },
-      { property: "og:title", content: "Survesy — Survey & Subscription Platform" },
+      { property: "og:title", content: "Survesy — Free Survey Platform" },
       {
         property: "og:description",
-        content: "Enterprise survey management and subscription platform.",
+        content: "Free enterprise-grade survey management and analytics platform.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Survesy — Survey & Subscription Platform" },
+      { name: "twitter:title", content: "Survesy — Free Survey Platform" },
       {
         name: "twitter:description",
-        content: "Enterprise survey management and subscription platform.",
+        content: "Free enterprise-grade survey management and analytics platform.",
       },
       {
         property: "og:image",
@@ -133,7 +134,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // useEffect(() => { seedDemoData(); seedAdminData(); }, []);
+
+  useEffect(() => {
+    applyTheme(getTheme());
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

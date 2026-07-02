@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import {
   Select,
@@ -15,33 +17,65 @@ import {
 } from "@/components/ui/select";
 
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { useSurveys } from "@/features/surveys/hooks/useSurveys";
+import { useDeleteSurvey } from "@/features/surveys/hooks/useDeleteSurvey";
+import { usePublishSurvey } from "@/features/surveys/hooks/usePublishSurvey";
+import { useCloseSurvey } from "@/features/surveys/hooks/useCloseSurvey";
+import { useUpdateSurvey } from "@/features/surveys/hooks/useUpdateSurvey";
+import { useRolePermissions } from "@/hooks/useRolePermissions";
 
-import { MoreHorizontal, Plus, Eye, Pencil, Share2, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Plus,
+  Eye,
+  Pencil,
+  Share2,
+  Trash2,
+  Rocket,
+  Lock,
+  RotateCcw,
+} from "lucide-react";
 
 import { toast } from "sonner";
-import { useDeleteSurvey } from "@/features/surveys/hooks/useDeleteSurvey";
-import { useRolePermissions } from "@/hooks/useRolePermissions";
 
 export const Route = createFileRoute("/_app/surveys/")({
   component: SurveyList,
 });
 
+const statusVariant = (status: string) => {
+  if (status === "PUBLISHED") return "default" as const;
+  if (status === "CLOSED") return "destructive" as const;
+  return "secondary" as const;
+};
+
 function SurveyList() {
   const { data, isLoading } = useSurveys();
   const { hasPermission } = useRolePermissions();
-  console.log(hasPermission, "Has Permisiion");
 
   const items = data?.data || [];
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
+
+  const [editing, setEditing] = useState<any>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDesc, setEditDesc] = useState("");
 
   const filtered = useMemo(() => {
     return items.filter(
@@ -50,7 +84,11 @@ function SurveyList() {
         survey.title.toLowerCase().includes(q.toLowerCase()),
     );
   }, [items, q, status]);
+
   const deleteSurveyMutation = useDeleteSurvey();
+  const publishSurveyMutation = usePublishSurvey();
+  const closeSurveyMutation = useCloseSurvey();
+  const updateSurveyMutation = useUpdateSurvey();
 
   const handleDelete = (id: string) => {
     const confirmed = window.confirm(
@@ -60,6 +98,36 @@ function SurveyList() {
     if (!confirmed) return;
 
     deleteSurveyMutation.mutate(id);
+  };
+
+  const openEdit = (survey: any) => {
+    setEditing(survey);
+    setEditTitle(survey.title);
+    setEditDesc(survey.description || "");
+  };
+
+  const saveEdit = () => {
+    if (!editing) return;
+    if (!editTitle.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    updateSurveyMutation.mutate(
+      {
+        id: editing._id,
+        payload: { title: editTitle.trim(), description: editDesc },
+      },
+      { onSuccess: () => setEditing(null) },
+    );
+  };
+
+  const copyShareLink = (survey: any) => {
+    navigator.clipboard.writeText(`${window.location.origin}/survey/${survey._id}`);
+    toast.success(
+      survey.status === "PUBLISHED"
+        ? "Public link copied"
+        : "Link copied — note: respondents can only open it once the survey is published",
+    );
   };
 
   if (isLoading) {
@@ -108,6 +176,8 @@ function SurveyList() {
                 <SelectItem value="DRAFT">Draft</SelectItem>
 
                 <SelectItem value="PUBLISHED">Published</SelectItem>
+
+                <SelectItem value="CLOSED">Closed</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -134,9 +204,7 @@ function SurveyList() {
                     <td className="px-4 py-2 font-medium">{survey.title}</td>
 
                     <td className="px-4 py-2">
-                      <Badge variant={survey.status === "PUBLISHED" ? "default" : "secondary"}>
-                        {survey.status}
-                      </Badge>
+                      <Badge variant={statusVariant(survey.status)}>{survey.status}</Badge>
                     </td>
 
                     <td className="px-4 py-2 text-muted-foreground">
@@ -168,27 +236,50 @@ function SurveyList() {
                             </Link>
                           </DropdownMenuItem>
 
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEdit(survey)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
 
+                          <DropdownMenuSeparator />
+
+                          {survey.status === "DRAFT" && (
+                            <DropdownMenuItem
+                              onClick={() => publishSurveyMutation.mutate(survey._id)}
+                            >
+                              <Rocket className="mr-2 h-4 w-4" />
+                              Publish
+                            </DropdownMenuItem>
+                          )}
+
+                          {survey.status === "PUBLISHED" && (
+                            <DropdownMenuItem
+                              onClick={() => closeSurveyMutation.mutate(survey._id)}
+                            >
+                              <Lock className="mr-2 h-4 w-4" />
+                              Close
+                            </DropdownMenuItem>
+                          )}
+
+                          {survey.status === "CLOSED" && (
+                            <DropdownMenuItem
+                              onClick={() => publishSurveyMutation.mutate(survey._id)}
+                            >
+                              <RotateCcw className="mr-2 h-4 w-4" />
+                              Reopen
+                            </DropdownMenuItem>
+                          )}
+
+                          <DropdownMenuItem onClick={() => copyShareLink(survey)}>
+                            <Share2 className="mr-2 h-4 w-4" />
+                            Share
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
                           <DropdownMenuItem onClick={() => handleDelete(survey._id)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                `${window.location.origin}/surveys/${survey._id}`,
-                              );
-
-                              toast.success("Link copied");
-                            }}
-                          >
-                            <Share2 className="mr-2 h-4 w-4" />
-                            Share
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -208,6 +299,37 @@ function SurveyList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit survey dialog */}
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit survey</DialogTitle>
+            <DialogDescription>Update the survey title and description.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={3} />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit} disabled={updateSurveyMutation.isPending}>
+              {updateSurveyMutation.isPending ? "Saving..." : "Save changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

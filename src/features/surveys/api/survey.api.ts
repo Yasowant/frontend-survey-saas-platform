@@ -24,17 +24,58 @@ export const getSurveyById = async (id: string) => {
   return response.data;
 };
 
+export const updateSurvey = async (
+  id: string,
+  payload: {
+    title?: string;
+    description?: string;
+    status?: "DRAFT" | "PUBLISHED" | "CLOSED";
+  },
+) => {
+  const response = await api.put(`/surveys/${id}`, payload);
+  return response.data;
+};
+
 export const deleteSurvey = async (id: string) => {
   const response = await api.delete(`/surveys/${id}`);
   return response.data;
 };
+
+export const publishSurvey = async (id: string) => {
+  const response = await api.post(`/surveys/${id}/publish`);
+  return response.data;
+};
+
+export const closeSurvey = async (id: string) => {
+  const response = await api.post(`/surveys/${id}/close`);
+  return response.data;
+};
+
+/** Public (no auth) — used by respondents opening a shared link. */
+export const getPublicSurvey = async (id: string) => {
+  const response = await api.get(`/surveys/${id}/public`);
+  return response.data;
+};
+
 export const submitSurveyResponse = async (payload: {
   surveyId: string;
   answers: {
     questionId: string;
-    value: string | number | boolean;
+    value: string | number | boolean | string[];
   }[];
 }) => {
   const response = await api.post("/responses", payload);
+  return response.data;
+};
+
+/** Public (no auth) — anonymous response submission. */
+export const submitPublicSurveyResponse = async (payload: {
+  surveyId: string;
+  answers: {
+    questionId: string;
+    value: string | number | boolean | string[];
+  }[];
+}) => {
+  const response = await api.post("/responses/public", payload);
   return response.data;
 };

@@ -16,8 +16,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Check, ChevronLeft, ChevronRight, GripVertical, Plus, Trash2 } from "lucide-react";
-import { surveysRepo, uid, auditRepo, notifRepo } from "@/lib/storage";
-import type { Question, Section, QuestionType, Rule } from "@/lib/types";
+import { uid } from "@/lib/storage";
+import type { Question, Section, QuestionType, Rule, RuleAction, RuleOperator } from "@/lib/types";
+import {
+  computeQuestionStates,
+  RULE_ACTIONS,
+  RULE_OPERATORS,
+  type EngineRule,
+} from "@/lib/rule-engine";
 import { useCreateSurvey } from "@/features/surveys/hooks/useCreateSurvey";
 import { toast } from "sonner";
 import { useCreateSection } from "@/features/surveys/hooks/useCreateSection";
@@ -69,6 +75,25 @@ function CreateSurvey() {
   };
 
   const publish = async (status: "DRAFT" | "PUBLISHED") => {
+    // Pre-publish validation
+    if (!name.trim()) {
+      toast.error("Survey name is required");
+      setStep(0);
+      return;
+    }
+    if (status === "PUBLISHED") {
+      if (sections.length === 0) {
+        toast.error("Cannot publish: add at least one section");
+        setStep(1);
+        return;
+      }
+      if (questions.length === 0) {
+        toast.error("Cannot publish: add at least one question");
+        setStep(1);
+        return;
+      }
+    }
+
     try {
       // 1. Create Survey
       const surveyRes = await createSurvey({
@@ -144,20 +169,24 @@ function CreateSurvey() {
         for (let i = 0; i < rules.length; i++) {
           const rule = rules[i];
 
+          const sourceQuestionId = questionMap.get(rule.ifQuestionId);
+
+          if (!sourceQuestionId) continue;
+
           await createRule({
             surveyId,
 
-            sourceQuestionId: questionMap.get(rule.ifQuestionId),
+            sourceQuestionId,
 
             targetQuestionId: questionMap.get(rule.thenQuestionId),
 
             targetSectionId: null,
 
-            operator: "EQUALS",
+            operator: rule.operator,
 
-            value: rule.ifValue,
+            value: ["IS_EMPTY", "IS_NOT_EMPTY"].includes(rule.operator) ? "-" : rule.ifValue,
 
-            action: rule.thenAction === "show" ? "SHOW" : "HIDE",
+            action: rule.thenAction,
 
             order: i + 1,
 
@@ -478,7 +507,9 @@ function CreateSurvey() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Rules engine</CardTitle>
-                <CardDescription>Show or hide questions based on answers</CardDescription>
+                <CardDescription>
+                  Show, hide, require or disable questions based on answers
+                </CardDescription>
               </div>
               <Button
                 size="sm"
@@ -489,8 +520,9 @@ function CreateSurvey() {
                     {
                       id: uid(),
                       ifQuestionId: questions[0].id,
+                      operator: "EQUALS",
                       ifValue: "Yes",
-                      thenAction: "show",
+                      thenAction: "SHOW",
                       thenQuestionId: questions[1].id,
                     },
                   ])
@@ -534,31 +566,55 @@ function CreateSurvey() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <span>=</span>
-                    <Input
-                      value={r.ifValue}
-                      onChange={(e) => {
+                    <Select
+                      value={r.operator}
+                      onValueChange={(v) => {
                         const n = [...rules];
-                        n[i] = { ...r, ifValue: e.target.value };
+                        n[i] = { ...r, operator: v as RuleOperator };
                         setRules(n);
                       }}
-                      className="w-32"
-                    />
+                    >
+                      <SelectTrigger className="w-44">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RULE_OPERATORS.map((op) => (
+                          <SelectItem key={op.value} value={op.value}>
+                            {op.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {!["IS_EMPTY", "IS_NOT_EMPTY"].includes(r.operator) && (
+                      <Input
+                        value={r.ifValue}
+                        onChange={(e) => {
+                          const n = [...rules];
+                          n[i] = { ...r, ifValue: e.target.value };
+                          setRules(n);
+                        }}
+                        className="w-32"
+                        placeholder="Value"
+                      />
+                    )}
                     <Badge variant="outline">THEN</Badge>
                     <Select
                       value={r.thenAction}
                       onValueChange={(v) => {
                         const n = [...rules];
-                        n[i] = { ...r, thenAction: v as "show" | "hide" };
+                        n[i] = { ...r, thenAction: v as RuleAction };
                         setRules(n);
                       }}
                     >
-                      <SelectTrigger className="w-24">
+                      <SelectTrigger className="w-36">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="show">Show</SelectItem>
-                        <SelectItem value="hide">Hide</SelectItem>
+                        {RULE_ACTIONS.map((a) => (
+                          <SelectItem key={a.value} value={a.value}>
+                            {a.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <Select
@@ -659,23 +715,21 @@ function PreviewRunner({
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
 
-  const visibleQuestions = useMemo(() => {
-    const visibility: Record<string, boolean> = {};
-    for (const q of questions) visibility[q.id] = true;
-    // show-targets default hidden
-    const showTargets = new Set(
-      rules.filter((r) => r.thenAction === "show").map((r) => r.thenQuestionId),
-    );
-    for (const id of showTargets) visibility[id] = false;
-    for (const r of rules) {
-      const a = answers[r.ifQuestionId];
-      const match = Array.isArray(a)
-        ? a.map(String).includes(r.ifValue)
-        : String(a ?? "").toLowerCase() === r.ifValue.toLowerCase();
-      if (!match) continue;
-      visibility[r.thenQuestionId] = r.thenAction === "show";
-    }
-    return visibility;
+  const questionStates = useMemo(() => {
+    const engineRules: EngineRule[] = rules.map((r, idx) => ({
+      sourceQuestionId: r.ifQuestionId,
+      targetQuestionId: r.thenQuestionId,
+      operator: r.operator,
+      value: r.ifValue,
+      action: r.thenAction,
+      order: idx + 1,
+    }));
+    const engineQuestions = questions.map((q) => ({
+      _id: q.id,
+      sectionId: q.sectionId,
+      required: q.required,
+    }));
+    return computeQuestionStates(engineRules, engineQuestions, answers);
   }, [questions, rules, answers]);
 
   if (sections.length === 0) {
@@ -695,7 +749,9 @@ function PreviewRunner({
   }
 
   const section = sections[Math.min(idx, sections.length - 1)];
-  const sectionQs = questions.filter((q) => q.sectionId === section.id && visibleQuestions[q.id]);
+  const sectionQs = questions.filter(
+    (q) => q.sectionId === section.id && questionStates[q.id]?.visible !== false,
+  );
   const setAns = (id: string, v: unknown) => setAnswers((a) => ({ ...a, [id]: v }));
 
   return (
@@ -735,9 +791,18 @@ function PreviewRunner({
           ) : (
             sectionQs.map((q) => {
               const val = answers[q.id];
+              const state = questionStates[q.id];
               return (
-                <div key={q.id} className="space-y-2 rounded-md border p-3">
-                  <Label className="text-sm font-medium">{q.label}</Label>
+                <div
+                  key={q.id}
+                  className={`space-y-2 rounded-md border p-3 ${
+                    state && !state.enabled ? "pointer-events-none opacity-50" : ""
+                  }`}
+                >
+                  <Label className="text-sm font-medium">
+                    {q.label}
+                    {state?.required && <span className="ml-1 text-red-500">*</span>}
+                  </Label>
                   {(q.type === "text" || q.type === "email" || q.type === "phone") && (
                     <Input
                       type={q.type === "email" ? "email" : "text"}

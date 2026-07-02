@@ -16,27 +16,23 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SurveyIdRouteImport } from './routes/survey.$id'
-import { Route as AppUpgradeRouteImport } from './routes/_app.upgrade'
 import { Route as AppSubscriptionRouteImport } from './routes/_app.subscription'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
-import { Route as AppBillingRouteImport } from './routes/_app.billing'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 import { Route as AppUsersIndexRouteImport } from './routes/_app.users.index'
 import { Route as AppSurveysIndexRouteImport } from './routes/_app.surveys.index'
 import { Route as AppRolesIndexRouteImport } from './routes/_app.roles.index'
 import { Route as AppResponsesIndexRouteImport } from './routes/_app.responses.index'
-import { Route as AppPlansIndexRouteImport } from './routes/_app.plans.index'
 import { Route as AppPermissionsIndexRouteImport } from './routes/_app.permissions.index'
 import { Route as AppUsersIdRouteImport } from './routes/_app.users.$id'
 import { Route as AppSurveysDraftsRouteImport } from './routes/_app.surveys.drafts'
 import { Route as AppSurveysCreateRouteImport } from './routes/_app.surveys.create'
 import { Route as AppSurveysArchivedRouteImport } from './routes/_app.surveys.archived'
 import { Route as AppRolesIdRouteImport } from './routes/_app.roles.$id'
-import { Route as AppPlansIdRouteImport } from './routes/_app.plans.$id'
 import { Route as AppSurveysSurveyIdAnalyticsRouteImport } from './routes/_app.surveys.$surveyId.analytics'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -73,11 +69,6 @@ const SurveyIdRoute = SurveyIdRouteImport.update({
   path: '/survey/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppUpgradeRoute = AppUpgradeRouteImport.update({
-  id: '/upgrade',
-  path: '/upgrade',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppSubscriptionRoute = AppSubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
@@ -101,11 +92,6 @@ const AppNotificationsRoute = AppNotificationsRouteImport.update({
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppBillingRoute = AppBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAuditRoute = AppAuditRouteImport.update({
@@ -138,11 +124,6 @@ const AppResponsesIndexRoute = AppResponsesIndexRouteImport.update({
   path: '/responses/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPlansIndexRoute = AppPlansIndexRouteImport.update({
-  id: '/plans/',
-  path: '/plans/',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppPermissionsIndexRoute = AppPermissionsIndexRouteImport.update({
   id: '/permissions/',
   path: '/permissions/',
@@ -173,11 +154,6 @@ const AppRolesIdRoute = AppRolesIdRouteImport.update({
   path: '/roles/$id',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPlansIdRoute = AppPlansIdRouteImport.update({
-  id: '/plans/$id',
-  path: '/plans/$id',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppSurveysSurveyIdAnalyticsRoute =
   AppSurveysSurveyIdAnalyticsRouteImport.update({
     id: '/surveys/$surveyId/analytics',
@@ -193,22 +169,18 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/analytics': typeof AppAnalyticsRoute
   '/audit': typeof AppAuditRoute
-  '/billing': typeof AppBillingRoute
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
   '/subscription': typeof AppSubscriptionRoute
-  '/upgrade': typeof AppUpgradeRoute
   '/survey/$id': typeof SurveyIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
   '/roles/$id': typeof AppRolesIdRoute
   '/surveys/archived': typeof AppSurveysArchivedRoute
   '/surveys/create': typeof AppSurveysCreateRoute
   '/surveys/drafts': typeof AppSurveysDraftsRoute
   '/users/$id': typeof AppUsersIdRoute
   '/permissions/': typeof AppPermissionsIndexRoute
-  '/plans/': typeof AppPlansIndexRoute
   '/responses/': typeof AppResponsesIndexRoute
   '/roles/': typeof AppRolesIndexRoute
   '/surveys/': typeof AppSurveysIndexRoute
@@ -223,22 +195,18 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/analytics': typeof AppAnalyticsRoute
   '/audit': typeof AppAuditRoute
-  '/billing': typeof AppBillingRoute
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
   '/subscription': typeof AppSubscriptionRoute
-  '/upgrade': typeof AppUpgradeRoute
   '/survey/$id': typeof SurveyIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
   '/roles/$id': typeof AppRolesIdRoute
   '/surveys/archived': typeof AppSurveysArchivedRoute
   '/surveys/create': typeof AppSurveysCreateRoute
   '/surveys/drafts': typeof AppSurveysDraftsRoute
   '/users/$id': typeof AppUsersIdRoute
   '/permissions': typeof AppPermissionsIndexRoute
-  '/plans': typeof AppPlansIndexRoute
   '/responses': typeof AppResponsesIndexRoute
   '/roles': typeof AppRolesIndexRoute
   '/surveys': typeof AppSurveysIndexRoute
@@ -255,22 +223,18 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/audit': typeof AppAuditRoute
-  '/_app/billing': typeof AppBillingRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/subscription': typeof AppSubscriptionRoute
-  '/_app/upgrade': typeof AppUpgradeRoute
   '/survey/$id': typeof SurveyIdRoute
-  '/_app/plans/$id': typeof AppPlansIdRoute
   '/_app/roles/$id': typeof AppRolesIdRoute
   '/_app/surveys/archived': typeof AppSurveysArchivedRoute
   '/_app/surveys/create': typeof AppSurveysCreateRoute
   '/_app/surveys/drafts': typeof AppSurveysDraftsRoute
   '/_app/users/$id': typeof AppUsersIdRoute
   '/_app/permissions/': typeof AppPermissionsIndexRoute
-  '/_app/plans/': typeof AppPlansIndexRoute
   '/_app/responses/': typeof AppResponsesIndexRoute
   '/_app/roles/': typeof AppRolesIndexRoute
   '/_app/surveys/': typeof AppSurveysIndexRoute
@@ -287,22 +251,18 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/analytics'
     | '/audit'
-    | '/billing'
     | '/dashboard'
     | '/notifications'
     | '/profile'
     | '/settings'
     | '/subscription'
-    | '/upgrade'
     | '/survey/$id'
-    | '/plans/$id'
     | '/roles/$id'
     | '/surveys/archived'
     | '/surveys/create'
     | '/surveys/drafts'
     | '/users/$id'
     | '/permissions/'
-    | '/plans/'
     | '/responses/'
     | '/roles/'
     | '/surveys/'
@@ -317,22 +277,18 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/analytics'
     | '/audit'
-    | '/billing'
     | '/dashboard'
     | '/notifications'
     | '/profile'
     | '/settings'
     | '/subscription'
-    | '/upgrade'
     | '/survey/$id'
-    | '/plans/$id'
     | '/roles/$id'
     | '/surveys/archived'
     | '/surveys/create'
     | '/surveys/drafts'
     | '/users/$id'
     | '/permissions'
-    | '/plans'
     | '/responses'
     | '/roles'
     | '/surveys'
@@ -348,22 +304,18 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_app/analytics'
     | '/_app/audit'
-    | '/_app/billing'
     | '/_app/dashboard'
     | '/_app/notifications'
     | '/_app/profile'
     | '/_app/settings'
     | '/_app/subscription'
-    | '/_app/upgrade'
     | '/survey/$id'
-    | '/_app/plans/$id'
     | '/_app/roles/$id'
     | '/_app/surveys/archived'
     | '/_app/surveys/create'
     | '/_app/surveys/drafts'
     | '/_app/users/$id'
     | '/_app/permissions/'
-    | '/_app/plans/'
     | '/_app/responses/'
     | '/_app/roles/'
     | '/_app/surveys/'
@@ -432,13 +384,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SurveyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/upgrade': {
-      id: '/_app/upgrade'
-      path: '/upgrade'
-      fullPath: '/upgrade'
-      preLoaderRoute: typeof AppUpgradeRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/subscription': {
       id: '/_app/subscription'
       path: '/subscription'
@@ -472,13 +417,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/billing': {
-      id: '/_app/billing'
-      path: '/billing'
-      fullPath: '/billing'
-      preLoaderRoute: typeof AppBillingRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/audit': {
@@ -523,13 +461,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppResponsesIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/plans/': {
-      id: '/_app/plans/'
-      path: '/plans'
-      fullPath: '/plans/'
-      preLoaderRoute: typeof AppPlansIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/permissions/': {
       id: '/_app/permissions/'
       path: '/permissions'
@@ -572,13 +503,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRolesIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/plans/$id': {
-      id: '/_app/plans/$id'
-      path: '/plans/$id'
-      fullPath: '/plans/$id'
-      preLoaderRoute: typeof AppPlansIdRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/surveys/$surveyId/analytics': {
       id: '/_app/surveys/$surveyId/analytics'
       path: '/surveys/$surveyId/analytics'
@@ -592,21 +516,17 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppAuditRoute: typeof AppAuditRoute
-  AppBillingRoute: typeof AppBillingRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
-  AppUpgradeRoute: typeof AppUpgradeRoute
-  AppPlansIdRoute: typeof AppPlansIdRoute
   AppRolesIdRoute: typeof AppRolesIdRoute
   AppSurveysArchivedRoute: typeof AppSurveysArchivedRoute
   AppSurveysCreateRoute: typeof AppSurveysCreateRoute
   AppSurveysDraftsRoute: typeof AppSurveysDraftsRoute
   AppUsersIdRoute: typeof AppUsersIdRoute
   AppPermissionsIndexRoute: typeof AppPermissionsIndexRoute
-  AppPlansIndexRoute: typeof AppPlansIndexRoute
   AppResponsesIndexRoute: typeof AppResponsesIndexRoute
   AppRolesIndexRoute: typeof AppRolesIndexRoute
   AppSurveysIndexRoute: typeof AppSurveysIndexRoute
@@ -617,21 +537,17 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppAuditRoute: AppAuditRoute,
-  AppBillingRoute: AppBillingRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
-  AppUpgradeRoute: AppUpgradeRoute,
-  AppPlansIdRoute: AppPlansIdRoute,
   AppRolesIdRoute: AppRolesIdRoute,
   AppSurveysArchivedRoute: AppSurveysArchivedRoute,
   AppSurveysCreateRoute: AppSurveysCreateRoute,
   AppSurveysDraftsRoute: AppSurveysDraftsRoute,
   AppUsersIdRoute: AppUsersIdRoute,
   AppPermissionsIndexRoute: AppPermissionsIndexRoute,
-  AppPlansIndexRoute: AppPlansIndexRoute,
   AppResponsesIndexRoute: AppResponsesIndexRoute,
   AppRolesIndexRoute: AppRolesIndexRoute,
   AppSurveysIndexRoute: AppSurveysIndexRoute,

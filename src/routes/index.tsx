@@ -28,8 +28,11 @@ import {
   HeartPulse,
   Briefcase,
   Megaphone,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,7 +41,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Enterprise survey platform with powerful analytics, conditional logic, and flexible subscription plans.",
+          "Free enterprise survey platform with powerful analytics and conditional logic.",
       },
       { property: "og:title", content: "Survesy — Build Surveys, Grow Insights" },
       {
@@ -83,34 +86,19 @@ const features = [
   },
   {
     icon: Sparkles,
-    title: "Flexible subscriptions",
-    desc: "Start free, upgrade as you grow. Transparent monthly pricing.",
+    title: "Free forever",
+    desc: "Every feature included at no cost. No upgrades, no hidden fees.",
     color: "from-rose-500 to-red-500",
   },
 ];
 
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    surveys: "3 surveys",
-    responses: "100 responses/mo",
-    highlight: false,
-  },
-  {
-    name: "Basic",
-    price: "$19",
-    surveys: "25 surveys",
-    responses: "5,000 responses/mo",
-    highlight: true,
-  },
-  {
-    name: "Premium",
-    price: "$49",
-    surveys: "Unlimited",
-    responses: "Unlimited responses",
-    highlight: false,
-  },
+const freeFeatures = [
+  "Unlimited surveys",
+  "Unlimited responses",
+  "Conditional logic rules",
+  "Analytics dashboard",
+  "User, role & permission management",
+  "Email notifications",
 ];
 
 const logos = [
@@ -245,6 +233,8 @@ function StatCard({ value, suffix, label }: { value: number; suffix: string; lab
 
 function Landing() {
   const [openVideo, setOpenVideo] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(() => getTheme());
+  const [showWorkflow, setShowWorkflow] = useState(false);
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
@@ -268,6 +258,14 @@ function Landing() {
             </a>
           </nav>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Toggle light/dark mode"
+              onClick={() => setThemeState(toggleTheme())}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link to="/login">Sign in</Link>
             </Button>
@@ -587,88 +585,62 @@ function Landing() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden py-28">
+      <section className="relative overflow-hidden py-14">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
 
         <div className="relative mx-auto max-w-6xl px-4">
           <div className="text-center">
             <Badge variant="outline">Workflow</Badge>
 
-            <h2 className="mt-4 text-4xl font-bold md:text-6xl">How Survesy Works</h2>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">How Survesy Works</h2>
 
-            <p className="mt-4 text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               From survey creation to actionable insights.
             </p>
           </div>
 
-          <div className="relative mt-24">
-            {/* Center Line */}
-            <div className="absolute left-1/2 top-0 hidden h-full w-px bg-gradient-to-b from-primary via-chart-2 to-chart-5 md:block" />
-
-            {workflowSteps.map((step, index) => {
-              const left = index % 2 === 0;
-
-              return (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {workflowSteps.map((step, index) => (
+              <Card
+                key={step.title}
+                className="group relative overflow-hidden border-border/50 bg-background/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
+              >
                 <div
-                  key={step.title}
-                  className={`relative mb-20 flex ${left ? "justify-start" : "justify-end"}`}
-                >
-                  <Card
-                    className={`
-                group
-                relative
-                w-full
-                max-w-md
-                overflow-hidden
-                border-border/50
-                bg-background/70
-                backdrop-blur-xl
-                transition-all
-                duration-500
-                hover:-translate-y-2
-                hover:shadow-2xl
-                hover:shadow-primary/20
-                ${left ? "-rotate-1" : "rotate-1"}
-              `}
-                  >
+                  className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-10 bg-gradient-to-br ${step.color}`}
+                />
+
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
                     <div
-                      className={`absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10 bg-gradient-to-br ${step.color}`}
-                    />
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${step.color} text-white`}
+                    >
+                      <step.icon className="h-4 w-4" />
+                    </div>
 
-                    <CardContent className="p-6">
-                      <div
-                        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-white`}
-                      >
-                        <step.icon className="h-6 w-6" />
+                    <div>
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        Step {index + 1}
                       </div>
+                      <h3 className="text-sm font-semibold">{step.title}</h3>
+                    </div>
+                  </div>
 
-                      <h3 className="text-xl font-semibold">{step.title}</h3>
+                  {showWorkflow && (
+                    <p className="mt-3 text-sm text-muted-foreground">{step.description}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-                      <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
-                    </CardContent>
-                  </Card>
-
-                  {/* Timeline Dot */}
-                  <div
-                    className="
-                absolute
-                left-1/2
-                top-1/2
-                hidden
-                h-5
-                w-5
-                -translate-x-1/2
-                -translate-y-1/2
-                rounded-full
-                border-4
-                border-background
-                bg-primary
-                md:block
-              "
-                  />
-                </div>
-              );
-            })}
+          <div className="mt-6 text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowWorkflow((v) => !v)}
+            >
+              {showWorkflow ? "Show less" : "Read more"}
+            </Button>
           </div>
         </div>
       </section>
@@ -683,55 +655,40 @@ function Landing() {
                 Pricing
               </Badge>
               <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                Simple, transparent pricing
+                Free. Forever.
               </h2>
-              <p className="mt-3 text-muted-foreground">Pick a plan that scales with you.</p>
+              <p className="mt-3 text-muted-foreground">
+                Every feature included. No credit card, no upgrades, no limits.
+              </p>
             </div>
           </Reveal>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {plans.map((p, i) => (
-              <Reveal key={p.name} delay={i * 100}>
-                <Card
-                  className={`relative h-full transition-all duration-300 hover:-translate-y-1 ${p.highlight ? "border-primary shadow-glow scale-[1.02]" : "hover:border-primary/40"}`}
-                >
-                  {p.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="animate-gradient bg-gradient-to-r from-primary via-chart-2 to-chart-5 text-primary-foreground">
-                        Most popular
-                      </Badge>
-                    </div>
-                  )}
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold">{p.name}</h3>
-                    <div className="mt-2 flex items-baseline gap-1">
-                      <span className="text-5xl font-bold">{p.price}</span>
-                      <span className="text-sm text-muted-foreground">/month</span>
-                    </div>
-                    <ul className="mt-5 space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" /> {p.surveys}
+          <div className="mx-auto mt-12 max-w-md">
+            <Reveal>
+              <Card className="relative border-primary shadow-glow">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="animate-gradient bg-gradient-to-r from-primary via-chart-2 to-chart-5 text-primary-foreground">
+                    Everything included
+                  </Badge>
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold">Free</h3>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-5xl font-bold">$0</span>
+                    <span className="text-sm text-muted-foreground">/forever</span>
+                  </div>
+                  <ul className="mt-5 space-y-2 text-sm">
+                    {freeFeatures.map((f) => (
+                      <li key={f} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-primary" /> {f}
                       </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" /> {p.responses}
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" /> Analytics dashboard
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" /> Email support
-                      </li>
-                    </ul>
-                    <Button
-                      className={`mt-6 w-full ${p.highlight ? "shadow-glow" : ""}`}
-                      variant={p.highlight ? "default" : "outline"}
-                      asChild
-                    >
-                      <Link to="/register">Get started</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
+                    ))}
+                  </ul>
+                  <Button className="mt-6 w-full shadow-glow" asChild>
+                    <Link to="/register">Get started free</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </Reveal>
           </div>
         </div>
       </section>
