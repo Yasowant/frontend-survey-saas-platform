@@ -9,6 +9,7 @@ export const surveyService = {
   deleteSurvey: surveyApi.deleteSurvey,
   publishSurvey: surveyApi.publishSurvey,
   closeSurvey: surveyApi.closeSurvey,
+  shareSurvey: surveyApi.shareSurvey,
   submitSurveyResponse: surveyApi.submitSurveyResponse,
   submitPublicSurveyResponse: surveyApi.submitPublicSurveyResponse,
 };

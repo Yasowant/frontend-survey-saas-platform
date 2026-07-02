@@ -38,6 +38,7 @@ import { useDeleteSurvey } from "@/features/surveys/hooks/useDeleteSurvey";
 import { usePublishSurvey } from "@/features/surveys/hooks/usePublishSurvey";
 import { useCloseSurvey } from "@/features/surveys/hooks/useCloseSurvey";
 import { useUpdateSurvey } from "@/features/surveys/hooks/useUpdateSurvey";
+import { useShareSurvey } from "@/features/surveys/hooks/useShareSurvey";
 import { useRolePermissions } from "@/hooks/useRolePermissions";
 
 import {
@@ -50,6 +51,8 @@ import {
   Rocket,
   Lock,
   RotateCcw,
+  Copy,
+  Mail,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -77,6 +80,10 @@ function SurveyList() {
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
 
+  const [sharing, setSharing] = useState<any>(null);
+  const [shareEmails, setShareEmails] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+
   const filtered = useMemo(() => {
     return items.filter(
       (survey: any) =>
@@ -89,6 +96,7 @@ function SurveyList() {
   const publishSurveyMutation = usePublishSurvey();
   const closeSurveyMutation = useCloseSurvey();
   const updateSurveyMutation = useUpdateSurvey();
+  const shareSurveyMutation = useShareSurvey();
 
   const handleDelete = (id: string) => {
     const confirmed = window.confirm(
@@ -121,12 +129,39 @@ function SurveyList() {
     );
   };
 
+  const shareLink = (survey: any) => `${window.location.origin}/survey/${survey._id}`;
+
   const copyShareLink = (survey: any) => {
-    navigator.clipboard.writeText(`${window.location.origin}/survey/${survey._id}`);
+    navigator.clipboard.writeText(shareLink(survey));
     toast.success(
       survey.status === "PUBLISHED"
         ? "Public link copied"
         : "Link copied — note: respondents can only open it once the survey is published",
+    );
+  };
+
+  const openShare = (survey: any) => {
+    setSharing(survey);
+    setShareEmails("");
+    setShareMessage("");
+  };
+
+  const sendInvitations = () => {
+    if (!sharing) return;
+    const emails = shareEmails
+      .split(/[\s,;]+/)
+      .map((e) => e.trim())
+      .filter(Boolean);
+    if (emails.length === 0) {
+      toast.error("Enter at least one email address");
+      return;
+    }
+    shareSurveyMutation.mutate(
+      {
+        id: sharing._id,
+        payload: { emails, message: shareMessage.trim() || undefined },
+      },
+      { onSuccess: () => setSharing(null) },
     );
   };
 
@@ -270,7 +305,7 @@ function SurveyList() {
                             </DropdownMenuItem>
                           )}
 
-                          <DropdownMenuItem onClick={() => copyShareLink(survey)}>
+                          <DropdownMenuItem onClick={() => openShare(survey)}>
                             <Share2 className="mr-2 h-4 w-4" />
                             Share
                           </DropdownMenuItem>
@@ -299,6 +334,69 @@ function SurveyList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Share survey dialog */}
+      <Dialog open={!!sharing} onOpenChange={(open) => !open && setSharing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share survey</DialogTitle>
+            <DialogDescription>
+              {sharing?.status === "PUBLISHED"
+                ? "Copy the public link or send email invitations. Emails are delivered in the background."
+                : "This survey is not published yet — publish it first so respondents can open the link."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Public link</Label>
+              <div className="flex gap-2">
+                <Input readOnly value={sharing ? shareLink(sharing) : ""} className="text-xs" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => sharing && copyShareLink(sharing)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Email invitations</Label>
+              <Textarea
+                value={shareEmails}
+                onChange={(e) => setShareEmails(e.target.value)}
+                placeholder={"alex@example.com, sam@example.com\nUp to 20 recipients"}
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Personal message (optional)</Label>
+              <Textarea
+                value={shareMessage}
+                onChange={(e) => setShareMessage(e.target.value)}
+                placeholder="Would love your feedback — takes 2 minutes!"
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSharing(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={sendInvitations}
+              disabled={shareSurveyMutation.isPending || sharing?.status !== "PUBLISHED"}
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              {shareSurveyMutation.isPending ? "Sending..." : "Send invitations"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit survey dialog */}
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>

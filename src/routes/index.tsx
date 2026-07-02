@@ -75,8 +75,8 @@ const features = [
   },
   {
     icon: Link2,
-    title: "Public share links",
-    desc: "Every published survey gets a link anyone can open — no respondent account required, anonymous responses supported.",
+    title: "Share by link or email",
+    desc: "Every published survey gets a public link anyone can open — no respondent account required. Or send email invitations with a personal message, delivered automatically in the background.",
     color: "from-cyan-500 to-blue-500",
   },
   {
@@ -145,7 +145,8 @@ const capabilities = [
   "Draft & publish workflow",
   "Role-based access",
   "Audit logs",
-  "Email notifications",
+  "Email invitations",
+  "Automated emails",
   "Real-time dashboard",
   "10 question types",
 ];
@@ -171,6 +172,10 @@ const faqs = [
   {
     q: "How does conditional logic work?",
     a: "In the builder you create rules like “IF question A equals Yes, THEN show question B”. You can choose from 8 operators (equals, contains, greater than, is empty…) and 6 actions (show, hide, require, make optional, enable, disable). Rules run live in the preview and are validated again on the server when a response is submitted.",
+  },
+  {
+    q: "How do emails work?",
+    a: "Survesy sends all emails automatically in the background — account verification, password reset, password-change confirmations, and survey invitations. You never wait on email delivery: the app responds instantly and messages typically arrive within a minute. Every email uses the same clean, branded template.",
   },
   {
     q: "Can I edit a survey after publishing?",

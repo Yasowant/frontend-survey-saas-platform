@@ -51,6 +51,15 @@ export const closeSurvey = async (id: string) => {
   return response.data;
 };
 
+/** Share a published survey by email — invitations are sent in the background. */
+export const shareSurvey = async (
+  id: string,
+  payload: { emails: string[]; message?: string },
+) => {
+  const response = await api.post(`/surveys/${id}/share`, payload);
+  return response.data;
+};
+
 /** Public (no auth) — used by respondents opening a shared link. */
 export const getPublicSurvey = async (id: string) => {
   const response = await api.get(`/surveys/${id}/public`);
