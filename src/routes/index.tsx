@@ -428,6 +428,18 @@ function Landing() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/60">
+        {/* Background demo video */}
+        <video
+          src={demoVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25 dark:opacity-15"
+        />
+        {/* Readability scrim over the video */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/85 via-background/70 to-background" />
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
         <div className="absolute inset-0 -z-10 grid-bg" />
         <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/25 blur-3xl animate-blob -z-10" />
