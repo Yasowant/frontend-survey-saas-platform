@@ -61,11 +61,17 @@ export const Route = createFileRoute("/")({
 
 const features = [
   {
+    icon: Sparkles,
+    title: "AI survey generation",
+    desc: "Describe the survey you need — “a hospital management survey” — and AI builds the sections, questions, and conditional-logic rules for you in seconds, saved as a draft you review and publish.",
+    color: "from-indigo-500 to-violet-500",
+    large: true,
+  },
+  {
     icon: Workflow,
     title: "Visual rule engine",
     desc: "8 operators and 6 actions — show, hide, require, make optional, enable or disable any question based on earlier answers. Rules run live in preview and are enforced on the server.",
     color: "from-violet-500 to-indigo-500",
-    large: true,
   },
   {
     icon: Rocket,
@@ -138,6 +144,7 @@ const steps = [
 ];
 
 const capabilities = [
+  "AI survey generation",
   "Conditional logic",
   "Anonymous responses",
   "Public share links",
@@ -161,6 +168,10 @@ const freeFeatures = [
 ];
 
 const faqs = [
+  {
+    q: "How does AI survey generation work?",
+    a: "Click “Generate with AI” on the surveys page and describe what you need — for example “a hospital management survey”. AI designs the sections, questions (across all 10 types), and conditional-logic rules, then saves it as a draft. You review, tweak anything, and publish when ready.",
+  },
   {
     q: "Do I need a credit card to start?",
     a: "No. Survesy is completely free — every feature is included and there is nothing to upgrade to.",
@@ -459,7 +470,7 @@ function Landing() {
               className="mb-6 rounded-full px-4 py-1.5 glass animate-gradient bg-gradient-to-r from-primary/10 via-chart-2/10 to-chart-5/10"
             >
               <Sparkles className="mr-1.5 h-3 w-3 text-primary" />
-              Surveys with a real rule engine — free forever
+              New: AI survey generation — describe it, we build it
             </Badge>
           </Reveal>
           <Reveal delay={100}>

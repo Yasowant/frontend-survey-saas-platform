@@ -39,6 +39,7 @@ import { usePublishSurvey } from "@/features/surveys/hooks/usePublishSurvey";
 import { useCloseSurvey } from "@/features/surveys/hooks/useCloseSurvey";
 import { useUpdateSurvey } from "@/features/surveys/hooks/useUpdateSurvey";
 import { useShareSurvey } from "@/features/surveys/hooks/useShareSurvey";
+import { useGenerateSurvey } from "@/features/surveys/hooks/useGenerateSurvey";
 import { useRolePermissions } from "@/hooks/useRolePermissions";
 
 import {
@@ -53,6 +54,7 @@ import {
   RotateCcw,
   Copy,
   Mail,
+  Sparkles,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -84,6 +86,9 @@ function SurveyList() {
   const [shareEmails, setShareEmails] = useState("");
   const [shareMessage, setShareMessage] = useState("");
 
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+
   const filtered = useMemo(() => {
     return items.filter(
       (survey: any) =>
@@ -97,6 +102,20 @@ function SurveyList() {
   const closeSurveyMutation = useCloseSurvey();
   const updateSurveyMutation = useUpdateSurvey();
   const shareSurveyMutation = useShareSurvey();
+  const generateSurveyMutation = useGenerateSurvey();
+
+  const handleGenerate = () => {
+    if (aiPrompt.trim().length < 5) {
+      toast.error("Describe the survey you want, e.g. “a hospital management survey”");
+      return;
+    }
+    generateSurveyMutation.mutate(aiPrompt.trim(), {
+      onSuccess: () => {
+        setAiOpen(false);
+        setAiPrompt("");
+      },
+    });
+  };
 
   const handleDelete = (id: string) => {
     const confirmed = window.confirm(
@@ -181,12 +200,18 @@ function SurveyList() {
         </div>
 
         {hasPermission("SURVEY_CREATE") && (
-          <Button asChild>
-            <Link to="/surveys/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Survey
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setAiOpen(true)}>
+              <Sparkles className="mr-2 h-4 w-4 text-primary" />
+              Generate with AI
+            </Button>
+            <Button asChild>
+              <Link to="/surveys/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Survey
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
 
@@ -334,6 +359,46 @@ function SurveyList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* AI generate dialog */}
+      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Generate survey with AI
+            </DialogTitle>
+            <DialogDescription>
+              Describe the survey you need. AI builds the sections, questions, and conditional-logic
+              rules — saved as a draft you can review and publish.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Label>What survey do you want?</Label>
+            <Textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="e.g. A hospital management survey covering patient experience, staff efficiency, and facility cleanliness"
+              rows={4}
+              maxLength={1000}
+            />
+            <p className="text-xs text-muted-foreground">
+              Tip: mention the topic, audience, and what you want to learn.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAiOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleGenerate} disabled={generateSurveyMutation.isPending}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              {generateSurveyMutation.isPending ? "Generating… (takes ~15s)" : "Generate survey"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Share survey dialog */}
       <Dialog open={!!sharing} onOpenChange={(open) => !open && setSharing(null)}>

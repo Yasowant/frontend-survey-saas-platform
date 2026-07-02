@@ -14,6 +14,12 @@ export const createSurvey = async (payload: {
   return response.data;
 };
 
+/** AI survey generation — describe the survey, GPT builds it as a draft. */
+export const generateSurvey = async (prompt: string) => {
+  const response = await api.post("/surveys/generate", { prompt });
+  return response.data;
+};
+
 export const getSurveys = async () => {
   const response = await api.get("surveys");
   return response.data;
@@ -52,10 +58,7 @@ export const closeSurvey = async (id: string) => {
 };
 
 /** Share a published survey by email — invitations are sent in the background. */
-export const shareSurvey = async (
-  id: string,
-  payload: { emails: string[]; message?: string },
-) => {
+export const shareSurvey = async (id: string, payload: { emails: string[]; message?: string }) => {
   const response = await api.post(`/surveys/${id}/share`, payload);
   return response.data;
 };

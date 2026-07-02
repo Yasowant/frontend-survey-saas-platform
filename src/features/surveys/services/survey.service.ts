@@ -2,6 +2,7 @@ import * as surveyApi from "../api/survey.api";
 
 export const surveyService = {
   createSurvey: surveyApi.createSurvey,
+  generateSurvey: surveyApi.generateSurvey,
   getSurveys: surveyApi.getSurveys,
   getSurveyById: surveyApi.getSurveyById,
   getPublicSurvey: surveyApi.getPublicSurvey,
